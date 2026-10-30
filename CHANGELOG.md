@@ -7,6 +7,16 @@
 <a name="english"></a>
 ## English
 
+### [1.0.0] - 2026-10-31
+#### Added
+- Official Release 1.0.0: Fully verified and stabilized across Minecraft 1.20.1 Forge.
+- Exponential cost scaling ($2^{\text{count}-1}$) for repeated same-rarity reforges.
+- Dynamic 1-Sigil base requirement for 2nd+ reforges of Common affixes to ensure uniform progression.
+- Unlimited slot stack limits (Integer.MAX_VALUE) for Sigils of Reforging and Rarity Materials across Simple, Normal, Ancient, and Esoteric Reforging Tables.
+- Safe NBT persistence and network VarInt packet synchronization for massive item stacks (> 64, > 127).
+- Automatic dirty state persistence (`tile.setChanged()`) on container menu close and item pickup.
+- Complete bypass of Apothic-Infinite's default reforge duplicate limit.
+
 ### [1.0.0-beta.5] - 2026-10-31
 #### Fixed
 - Fixed item loss on world save/reload (relog): overhaul `ItemStackHandlerMixin` to ensure positive byte counts in NBT so vanilla deserialization never discards extended stacks as empty/invalid.
@@ -94,6 +104,16 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.0.0] - 2026-10-31
+#### 追加・正式リリース
+- 正式リリース版 1.0.0: Minecraft 1.20.1 Forge 環境における全機能の安定動作を検証・確立。
+- 同一レアリティの連続再鍛造における指数関数的なコスト増加 ($2^{\text{回数}-1}$ 倍)。
+- コモンアフィックス再鍛造（2回目以降）における基準紋章コスト1個の設定による、全レアリティ均一な倍化進行。
+- 全4種（簡易・通常・古代・秘術）の再鍛造台における素材・紋章スロットのスタック上限無制限化（Integer.MAX_VALUE）およびインベントリ誤消費の完全撤廃。
+- 64個および127個を超える巨大スタックに対応したネットワーク通信（VarInt化）およびNBTデータ安全保存（ExtendedCount）・リログ復元対応。
+- メニュー終了時・素材消費時のブロックエンティティ保存フラグ（setChanged）保証によるワールド保存の安定化。
+- Apothic-Infinite の重複鍛造上限（max_affix_level）の自動最大値開放。
 
 ### [1.0.0-beta.5] - 2026-10-31
 #### 修正
