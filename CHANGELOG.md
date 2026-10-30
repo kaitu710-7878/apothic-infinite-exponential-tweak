@@ -7,6 +7,14 @@
 <a name="english"></a>
 ## English
 
+### [1.1.0] - 2026-10-31
+#### Added
+- Added exponential cost scaling for Augmenting Table (Sigil of Enhancement) upgrades beyond the default maximum level (1.0F): 1st breakthrough (1.00F -> 1.25F) requires 4 sigils ($2 \times 2^1$), 2nd requires 8 sigils ($2 \times 2^2$), 3rd requires 16 sigils ($2 \times 2^3$), doubling exponentially. Normal upgrades (< 1.0F) remain at vanilla cost (2 sigils).
+- Unlocked Sigil of Enhancement slot stack limit to Integer.MAX_VALUE in the Augmenting Table.
+- Ensured block entity dirty state persistence (`tile.setChanged()`) and network synchronization on augment upgrade, preventing item stack loss across relog and save cycles.
+- Dynamic UI tooltip and button state synchronization on Augmenting Table screen: accurately reflects current dynamic cost and gray-outs when sigils are insufficient, guaranteeing 100% consistency between display and actual consumption.
+- Added tooltip indicators showing total augment breakthroughs on augmented items.
+
 ### [1.0.0] - 2026-10-31
 #### Added
 - Official Release 1.0.0: Fully verified and stabilized across Minecraft 1.20.1 Forge.
@@ -104,6 +112,14 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.1.0] - 2026-10-31
+#### 追加・新機能
+- 補強テーブル（Augmenting Table）におけるデフォルト上限値（1.0F）を超えた値の強化に対する指数関数的コスト倍化を追加: 1回目の上限突破（1.00F $\to$ 1.25F）で補強の紋章4個（$2 \times 2^1$）、2回目で8個（$2 \times 2^2$）、3回目で16個（$2 \times 2^3$）と強化ごとに倍増。1.0F以下の通常強化はバニラ通り（2個）を維持。
+- 補強テーブルの「補強の紋章」スロットのスタック上限を Integer.MAX_VALUE（無制限）に開放。
+- 強化時およびメニュー終了時にブロックエンティティの保存フラグ（`tile.setChanged()`）とパケット同期を確実に呼び出し、リログ時の紋章消滅を完全防止。
+- 補強テーブル画面のアップグレードボタンおよびツールチップを動的コストと完全連動させ、必要コスト・ボタン有効化状態・実際の消費量を100%一致。
+- アイテムツールチップに補強上限突破回数の表示を追加。
 
 ### [1.0.0] - 2026-10-31
 #### 追加・正式リリース
