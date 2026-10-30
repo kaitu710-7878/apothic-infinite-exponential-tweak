@@ -1,3 +1,6 @@
 {
-  "tooltip.apothic_infinite_exponential_tweak.reforge_info": "Reforge Tier %s: Count %s (Next Cost: %s)"
+  "tooltip.apothic_infinite_exponential_tweak.reforge_info": "Reforge Tier %s: Count %s (Next Cost: %s)",
+  "tooltip.apothic_infinite_exponential_tweak.augment_cost": "Upgrade Cost: %sx Sigils of Enhancement",
+  "tooltip.apothic_infinite_exponential_tweak.augment_count": "Breakthrough Count: +%s",
+  "tooltip.apothic_infinite_exponential_tweak.augment_total_info": "Augment Breakthrough: +%s"
 }

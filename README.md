@@ -31,10 +31,19 @@ An addon for **Apotheosis** and **Apothic Infinite** (Minecraft 1.20.1 Forge) th
    - To completely eliminate accidental material consumption from player inventories, automatic inventory draining has been removed.
    - Instead, the stack limit for **Sigils of Reforging** and **Rarity Materials** slots across all 4 reforging tables (Simple Reforging Table, Reforging Table, Ancient Reforging Table, and Esoteric Reforging Table) is unlocked to `Integer.MAX_VALUE`.
    - Players can stack hundreds or thousands of materials directly inside the table slots. Reforging operations strictly consume items placed in the table slots only.
-4. **Item Tooltips & Visual Feedback**
+4. **Augmenting Table Over-Cap Scaling & Unlimited Slot Limit**
+   - When upgrading an affix beyond the vanilla Apotheosis limit (1.0F) at the **Augmenting Table**, the required amount of **Sigils of Enhancement** doubles exponentially each upgrade:
+     - **Normal upgrades ($\le 1.0\text{F}$):** 2 Sigils (Vanilla cost)
+     - **1st Breakthrough ($1.00\text{F} \rightarrow 1.25\text{F}$):** $2 \times 2^1 = 4$ Sigils
+     - **2nd Breakthrough ($1.25\text{F} \rightarrow 1.50\text{F}$):** $2 \times 2^2 = 8$ Sigils
+     - **3rd Breakthrough ($1.50\text{F} \rightarrow 1.75\text{F}$):** $2 \times 2^3 = 16$ Sigils
+     - **$n$-th Breakthrough:** $2 \times 2^n$ Sigils
+   - The Sigil of Enhancement slot stack limit in the Augmenting Table is also unlocked to `Integer.MAX_VALUE`.
+   - The screen button tooltips and gray-out conditions are completely synchronized in real time with the actual required costs.
+5. **Item Tooltips & Visual Feedback**
    - Shows the previous reforge count and next cost multiplier on item tooltips.
    - Reforge table interface clearly displays current scaled costs in real-time.
-5. **Cross-Mod Compatibility**
+6. **Cross-Mod Compatibility**
    - Built-in soft compatibility with addon tables such as *Ancient Reforging* and *Esoteric Reforging*.
 
 ### Requirements
@@ -72,10 +81,19 @@ Minecraft 1.20.1 Forge環境向け、**Apotheosis** および **Apothic Infinite
    - インベントリからの意図しない素材消費事故を完全に防ぐため、インベントリからの自動消費仕様を廃止しました。
    - 代わりに、全4種の再鍛造台（簡易再鍛造台、再鍛造台、古代の再鍛造台、秘術の再鍛造台）において、「再鍛造の紋章」スロットおよび「レアリティマテリアル」スロットのスタック上限を `Integer.MAX_VALUE`（実質無制限）に拡張しました。
    - プレイヤーはスロット内に64個を超えて何百・何千個もの素材を直接スタックして投入でき、鍛造コストはスロット内の素材からのみ安全に消費されます。
-4. **ツールチップ＆UI情報表示**
+4. **補強テーブル（Augmenting Table）の上限突破指数コスト＆スロット上限開放**
+   - **補強テーブル**において、バニラApotheosisの上限（1.0F）を超えた値の強化を行うたびに、要求される「**補強の紋章 (Sigil of Enhancement)**」の必要数が倍増します：
+     - **通常強化（1.0F以下）:** 2個（バニラ通り）
+     - **上限突破 1回目（$1.00\text{F} \rightarrow 1.25\text{F}$）:** $2 \times 2^1 = 4$個
+     - **上限突破 2回目（$1.25\text{F} \rightarrow 1.50\text{F}$）:** $2 \times 2^2 = 8$個
+     - **上限突破 3回目（$1.50\text{F} \rightarrow 1.75\text{F}$）:** $2 \times 2^3 = 16$個
+     - **上限突破 $n$回目:** $2 \times 2^n$個
+   - 補強テーブルの「補強の紋章」スロット上限も `Integer.MAX_VALUE`（実質無制限）に開放され、数百個以上の紋章を直接投入可能です。
+   - 画面上のボタンツールチップ表示および不足時の非活性化判定も動的コストと100%リアルタイム連動します。
+5. **ツールチップ＆UI情報表示**
    - アイテムのツールチップに、現在のレアリティにおける鍛造回数と次回鍛造時のコスト倍率を表示します。
    - 再鍛造台のGUI上でも正確な必要個数が赤色/灰色でリアルタイム表示されます。
-5. **高いアドオン親和性**
+6. **高いアドオン親和性**
    - *Ancient Reforging* や *Esoteric Reforging* などの追加リフォージ台MODにも柔軟に対応しています。
 
 ### 導入要件

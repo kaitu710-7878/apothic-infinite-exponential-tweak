@@ -18,7 +18,10 @@ The server configuration file is saved at `config/apothic_infinite_exponential_t
 | `scale_material_cost` | `Boolean` | `true` | Whether the rarity materials cost scales exponentially on repeated reforges. |
 | `max_cost_cap` | `Integer` | `64000` | The maximum cost cap for items per reforge operation to prevent unintended overflow. |
 | `reset_count_on_rarity_change` | `Boolean` | `false` | If true, reforging with a different rarity tier resets the reforge count. If false (default), reforge counts are tracked separately per rarity tier. |
+| `scale_augment_cost` | `Boolean` | `true` | If true, upgrades beyond the default maximum level (1.0F) at the Augmenting Table exponentially scale the required Sigils of Enhancement. |
+| `augment_base_exponent` | `Double` | `2.0` | The exponential multiplier for Augmenting Table upgrades beyond 1.0F ($2 \times \text{base}^{\text{over\_count}+1}$, e.g. 4, 8, 16, 32...). |
 | `show_reforge_count_tooltip` | `Boolean` | `true` | Whether to display the reforge count and next cost multiplier on item tooltips. |
+| `show_augment_tooltip` | `Boolean` | `true` | Whether to display the over-level augment upgrade count on item tooltips. |
 
 ---
 
@@ -36,4 +39,7 @@ The server configuration file is saved at `config/apothic_infinite_exponential_t
 | `scale_material_cost` | `Boolean` | `true` | trueの場合、レアリティマテリアルの必要数を指数関数的に増加させます。 |
 | `max_cost_cap` | `Integer` | `64000` | 1回の鍛造で要求される素材数の最大上限値（整数オーバーフローや極端な過大請求を防止）。 |
 | `reset_count_on_rarity_change` | `Boolean` | `false` | trueの場合、異なるレアリティで鍛造すると回数がリセットされます。false（推奨）の場合、レアリティごとに個別に鍛造回数が保持されます。 |
+| `scale_augment_cost` | `Boolean` | `true` | trueの場合、補強テーブルでデフォルト最大値（1.0F）を超えた値の強化時に「補強の紋章」の必要数を指数関数的に倍加させます。 |
+| `augment_base_exponent` | `Double` | `2.0` | 補強テーブルにおける1.0F超え強化の指数倍率（計算式: $2 \times 2^{\text{突破回数}+1}$、例: 4個、8個、16個、32個…）。 |
 | `show_reforge_count_tooltip` | `Boolean` | `true` | trueの場合、アイテムのツールチップに鍛造回数と次回コスト倍率を表示します。 |
+| `show_augment_tooltip` | `Boolean` | `true` | trueの場合、アイテムのツールチップに補強上限突破回数を表示します。 |

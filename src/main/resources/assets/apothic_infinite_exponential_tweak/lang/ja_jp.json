@@ -1,3 +1,6 @@
 {
-  "tooltip.apothic_infinite_exponential_tweak.reforge_info": "再鍛造 %s: 鍛造回数 %s (次回コスト: %s)"
+  "tooltip.apothic_infinite_exponential_tweak.reforge_info": "再鍛造 %s: 鍛造回数 %s (次回コスト: %s)",
+  "tooltip.apothic_infinite_exponential_tweak.augment_cost": "補強コスト: 補強の紋章 x%s",
+  "tooltip.apothic_infinite_exponential_tweak.augment_count": "上限突破回数: +%s回",
+  "tooltip.apothic_infinite_exponential_tweak.augment_total_info": "補強上限突破: 合計 +%s回"
 }
