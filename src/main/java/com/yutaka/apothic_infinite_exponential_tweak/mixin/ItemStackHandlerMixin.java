@@ -4,6 +4,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.items.ItemStackHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,8 +29,13 @@ public abstract class ItemStackHandlerMixin {
                 int slot = itemTags.getInt("Slot");
                 if (slot >= 0 && slot < this.stacks.size()) {
                     ItemStack stack = this.stacks.get(slot);
-                    if (!stack.isEmpty() && stack.getCount() > 127) {
-                        itemTags.putInt("ExtendedCount", stack.getCount());
+                    if (!stack.isEmpty()) {
+                        int count = stack.getCount();
+                        if (count > 64) {
+                            itemTags.putInt("ExtendedCount", count);
+                            // バニラロード時に count <= 0 で EMPTY 判定され破棄されないよう正の数を保証
+                            itemTags.putByte("Count", (byte) 1);
+                        }
                     }
                 }
             }
@@ -44,9 +50,19 @@ public abstract class ItemStackHandlerMixin {
                 CompoundTag itemTags = tagList.getCompound(i);
                 int slot = itemTags.getInt("Slot");
                 if (slot >= 0 && slot < this.stacks.size() && itemTags.contains("ExtendedCount", 3)) {
+                    int extendedCount = itemTags.getInt("ExtendedCount");
                     ItemStack stack = this.stacks.get(slot);
-                    if (!stack.isEmpty()) {
-                        stack.setCount(itemTags.getInt("ExtendedCount"));
+                    if (stack != null && !stack.is(Items.AIR) && stack != ItemStack.EMPTY) {
+                        stack.setCount(extendedCount);
+                    } else {
+                        // 万が一 stack が EMPTY だった場合でも安全タグから再生成して復元
+                        CompoundTag safeTag = itemTags.copy();
+                        safeTag.putByte("Count", (byte) 1);
+                        ItemStack restored = ItemStack.of(safeTag);
+                        if (!restored.isEmpty()) {
+                            restored.setCount(extendedCount);
+                            this.stacks.set(slot, restored);
+                        }
                     }
                 }
             }

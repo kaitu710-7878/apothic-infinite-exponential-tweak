@@ -112,6 +112,16 @@ public abstract class ReforgingResultSlotMixin extends SlotItemHandler {
                 }
 
                 EnchantmentUtils.chargeExperience(player, ApothMiscUtil.getExpCostForSlot(levelCost, this.getSlotIndex()));
+
+                try {
+                    BlockEntityMenuAccessor beAccessor = (BlockEntityMenuAccessor) menu;
+                    net.minecraft.world.level.block.entity.BlockEntity tile = beAccessor.apoExp$getTile();
+                    if (tile != null) {
+                        tile.setChanged();
+                    }
+                } catch (Throwable ignored) {
+                }
+                menu.broadcastChanges();
             }
             menu.getSlot(0).set(ItemStack.EMPTY);
 

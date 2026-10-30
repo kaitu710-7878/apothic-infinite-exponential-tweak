@@ -7,6 +7,11 @@
 <a name="english"></a>
 ## English
 
+### [1.0.0-beta.5] - 2026-10-31
+#### Fixed
+- Fixed item loss on world save/reload (relog): overhaul `ItemStackHandlerMixin` to ensure positive byte counts in NBT so vanilla deserialization never discards extended stacks as empty/invalid.
+- Ensured block entity dirty state persistence: added `tile.setChanged()` hooks on menu close (`removed`) and after material consumption (`onTake`) across all reforging table variants to ensure internal slot inventories are reliably committed to disk.
+
 ### [1.0.0-beta.4] - 2026-10-31
 #### Fixed
 - Fixed actual material and sigil consumption mismatch on reforging: costs are now accurately calculated and deducted before clearing input slot 0 in ReforgingResultSlotMixin.onTake.
@@ -89,6 +94,11 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.0.0-beta.5] - 2026-10-31
+#### 修正
+- リログ（ワールド保存・再読み込み）時に再鍛造台内部スロットの素材が消滅する不具合を根本修正: `ItemStackHandlerMixin` を刷新し、64個超のスタック保存時にバニラ側の判定で空アイテムとして破棄されないようNBT整合性を保証。
+- ブロックエンティティの保存フラグ（setChanged）の確実な呼び出し: メニュー終了時（`removed`）および素材消費時（`onTake`）に確実にタイルエンティティの `setChanged()` を呼び出し、内部スロットの変更をワールドディスクへ確実に保存。
 
 ### [1.0.0-beta.4] - 2026-10-31
 #### 修正
