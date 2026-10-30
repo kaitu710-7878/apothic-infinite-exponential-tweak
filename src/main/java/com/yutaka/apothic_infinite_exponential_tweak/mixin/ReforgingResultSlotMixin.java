@@ -99,7 +99,6 @@ public abstract class ReforgingResultSlotMixin extends SlotItemHandler {
         }
 
         if (!player.level().isClientSide) {
-            menu.getSlot(0).set(ItemStack.EMPTY);
             if (!player.isCreative()) {
                 int sigilCost = menu.getSigilCost(this.getSlotIndex());
                 int matCost = menu.getMatCost(this.getSlotIndex());
@@ -114,6 +113,7 @@ public abstract class ReforgingResultSlotMixin extends SlotItemHandler {
 
                 EnchantmentUtils.chargeExperience(player, ApothMiscUtil.getExpCostForSlot(levelCost, this.getSlotIndex()));
             }
+            menu.getSlot(0).set(ItemStack.EMPTY);
 
             player.getPersistentData().putInt(ReforgingMenu.REFORGE_SEED, player.getRandom().nextInt());
             ReforgingMenuAccessor accessor = (ReforgingMenuAccessor) menu;

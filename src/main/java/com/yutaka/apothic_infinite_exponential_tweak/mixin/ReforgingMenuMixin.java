@@ -13,6 +13,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -48,14 +49,27 @@ public abstract class ReforgingMenuMixin {
         }
     }
 
+    @Unique
+    private ItemStack apoExp$lastInput = ItemStack.EMPTY;
+
     private ItemStack apoExp$getInputItem() {
         try {
             AbstractContainerMenu menu = (AbstractContainerMenu) (Object) this;
             ItemStack stack = menu.getSlot(0).getItem();
-            if (!stack.isEmpty()) return stack;
+            if (!stack.isEmpty()) {
+                this.apoExp$lastInput = stack.copy();
+                return stack;
+            }
         } catch (Throwable ignored) {
         }
-        return this.itemInv != null ? this.itemInv.getStackInSlot(0) : ItemStack.EMPTY;
+        if (this.itemInv != null) {
+            ItemStack stack = this.itemInv.getStackInSlot(0);
+            if (!stack.isEmpty()) {
+                this.apoExp$lastInput = stack.copy();
+                return stack;
+            }
+        }
+        return this.apoExp$lastInput;
     }
 
     @Inject(method = "getSigilCost", at = @At("RETURN"), cancellable = true, remap = false)
@@ -80,7 +94,14 @@ public abstract class ReforgingMenuMixin {
     private void apoExp$onSlotsChanged(Container pContainer, CallbackInfo ci) {
         ItemStack input = apoExp$getInputItem();
         LootRarity rarity = this.getRarity();
-        if (input.isEmpty() || rarity == null || this.choicesInv == null) return;
+        if (input.isEmpty() || rarity == null || this.choicesInv == null) {
+            if (input.isEmpty()) {
+                this.apoExp$lastInput = ItemStack.EMPTY;
+            }
+            return;
+        }
+
+        this.apoExp$lastInput = input.copy();
 
         for (int i = 0; i < 3; i++) {
             ItemStack output = this.choicesInv.getStackInSlot(i);

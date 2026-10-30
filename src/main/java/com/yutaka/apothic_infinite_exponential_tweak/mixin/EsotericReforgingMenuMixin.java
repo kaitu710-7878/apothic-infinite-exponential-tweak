@@ -54,14 +54,27 @@ public abstract class EsotericReforgingMenuMixin {
         }
     }
 
+    @org.spongepowered.asm.mixin.Unique
+    private ItemStack apoExp$lastEsotericInput = ItemStack.EMPTY;
+
     private ItemStack apoExp$getEsotericInputItem() {
         try {
             AbstractContainerMenu menu = (AbstractContainerMenu) (Object) this;
             ItemStack stack = menu.getSlot(0).getItem();
-            if (!stack.isEmpty()) return stack;
+            if (!stack.isEmpty()) {
+                this.apoExp$lastEsotericInput = stack.copy();
+                return stack;
+            }
         } catch (Throwable ignored) {
         }
-        return this.itemInv != null ? this.itemInv.getStackInSlot(0) : ItemStack.EMPTY;
+        if (this.itemInv != null) {
+            ItemStack stack = this.itemInv.getStackInSlot(0);
+            if (!stack.isEmpty()) {
+                this.apoExp$lastEsotericInput = stack.copy();
+                return stack;
+            }
+        }
+        return this.apoExp$lastEsotericInput;
     }
 
     @Dynamic
@@ -89,7 +102,14 @@ public abstract class EsotericReforgingMenuMixin {
     private void apoExp$onEsotericSlotsChanged(Container pContainer, CallbackInfo ci) {
         ItemStack input = apoExp$getEsotericInputItem();
         LootRarity rarity = this.getRarity();
-        if (input.isEmpty() || rarity == null || this.choicesInv == null) return;
+        if (input.isEmpty() || rarity == null || this.choicesInv == null) {
+            if (input.isEmpty()) {
+                this.apoExp$lastEsotericInput = ItemStack.EMPTY;
+            }
+            return;
+        }
+
+        this.apoExp$lastEsotericInput = input.copy();
 
         for (int i = 0; i < 3; i++) {
             ItemStack output = this.choicesInv.getStackInSlot(i);

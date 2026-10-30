@@ -7,6 +7,11 @@
 <a name="english"></a>
 ## English
 
+### [1.0.0-beta.4] - 2026-10-31
+#### Fixed
+- Fixed actual material and sigil consumption mismatch on reforging: costs are now accurately calculated and deducted before clearing input slot 0 in ReforgingResultSlotMixin.onTake.
+- Added input item snapshot caching (lastInput) in ReforgingMenuMixin, AncientReforgingMenuMixin, and EsotericReforgingMenuMixin so dynamic cost scaling remains active and returns the exact multiplied cost even immediately after slot 0 is cleared during item extraction.
+
 ### [1.0.0-beta.3] - 2026-10-31
 #### Fixed
 - Fixed game launch crash caused by `InvalidInjectionException` on `SlotItemHandlerMixin.apoExp$onGetMaxStackSize`: enabled default Mojang/SRG remapping so `getMaxStackSize` properly targets runtime obfuscated methods (`m_6641_` and `m_5866_`) on Forge production environments.
@@ -84,6 +89,11 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.0.0-beta.4] - 2026-10-31
+#### 修正
+- 再鍛造時に見かけ上の必要素材数と実際の消費量が一致しない不具合の修正: `ReforgingResultSlotMixin.onTake` において入力スロット0を空にする前に消費コストを確定・減算するよう修正。
+- `ReforgingMenuMixin`、`AncientReforgingMenuMixin`、`EsotericReforgingMenuMixin` に対し、入力アイテムのスナップショット保持（`lastInput`）を追加。アイテム取り出し時にスロット0が空になった直後でも正確な倍化コストを維持・返却するよう強化。
 
 ### [1.0.0-beta.3] - 2026-10-31
 #### 修正
