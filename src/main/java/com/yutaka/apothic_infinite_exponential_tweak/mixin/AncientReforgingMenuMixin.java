@@ -1,0 +1,78 @@
+package com.yutaka.apothic_infinite_exponential_tweak.mixin;
+
+import com.yutaka.apothic_infinite_exponential_tweak.util.ExponentialCostHelper;
+import dev.shadowsoffire.apotheosis.adventure.loot.LootRarity;
+import dev.shadowsoffire.placebo.cap.InternalItemHandler;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import org.spongepowered.asm.mixin.Dynamic;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import javax.annotation.Nullable;
+
+@Pseudo
+@Mixin(targets = "com.ianm1647.ancientreforging.screen.AncientReforgingMenu", remap = false)
+public abstract class AncientReforgingMenuMixin {
+
+    @Shadow(remap = false)
+    protected InternalItemHandler itemInv;
+
+    @Shadow(remap = false)
+    protected InternalItemHandler choicesInv;
+
+    @Shadow(remap = false)
+    @Nullable
+    public abstract LootRarity getRarity();
+
+    private ItemStack apoExp$getAncientInputItem() {
+        try {
+            AbstractContainerMenu menu = (AbstractContainerMenu) (Object) this;
+            ItemStack stack = menu.getSlot(0).getItem();
+            if (!stack.isEmpty()) return stack;
+        } catch (Throwable ignored) {
+        }
+        return this.itemInv != null ? this.itemInv.getStackInSlot(0) : ItemStack.EMPTY;
+    }
+
+    @Dynamic
+    @Inject(method = "getSigilCost", at = @At("RETURN"), cancellable = true, remap = false, require = 0)
+    private void apoExp$scaleAncientSigilCost(int slot, CallbackInfoReturnable<Integer> cir) {
+        int originalCost = cir.getReturnValue();
+        ItemStack input = apoExp$getAncientInputItem();
+        LootRarity rarity = this.getRarity();
+        int scaledCost = ExponentialCostHelper.computeSigilCost(originalCost, input, rarity);
+        cir.setReturnValue(scaledCost);
+    }
+
+    @Dynamic
+    @Inject(method = "getMatCost", at = @At("RETURN"), cancellable = true, remap = false, require = 0)
+    private void apoExp$scaleAncientMatCost(int slot, CallbackInfoReturnable<Integer> cir) {
+        int originalCost = cir.getReturnValue();
+        ItemStack input = apoExp$getAncientInputItem();
+        LootRarity rarity = this.getRarity();
+        int scaledCost = ExponentialCostHelper.computeMatCost(originalCost, input, rarity);
+        cir.setReturnValue(scaledCost);
+    }
+
+    @Dynamic
+    @Inject(method = "slotsChanged", at = @At("TAIL"), require = 0)
+    private void apoExp$onAncientSlotsChanged(Container pContainer, CallbackInfo ci) {
+        ItemStack input = apoExp$getAncientInputItem();
+        LootRarity rarity = this.getRarity();
+        if (input.isEmpty() || rarity == null || this.choicesInv == null) return;
+
+        for (int i = 0; i < 3; i++) {
+            ItemStack output = this.choicesInv.getStackInSlot(i);
+            if (!output.isEmpty()) {
+                ExponentialCostHelper.recordReforgeSuccess(output, input, rarity);
+            }
+        }
+    }
+}
