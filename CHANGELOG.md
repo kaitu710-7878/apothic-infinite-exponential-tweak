@@ -7,13 +7,17 @@
 <a name="english"></a>
 ## English
 
+### [1.0.0-beta.3] - 2026-10-31
+#### Fixed
+- Fixed game launch crash caused by `InvalidInjectionException` on `SlotItemHandlerMixin.apoExp$onGetMaxStackSize`: enabled default Mojang/SRG remapping so `getMaxStackSize` properly targets runtime obfuscated methods (`m_6641_` and `m_5866_`) on Forge production environments.
+
 ### [1.0.0-beta.2] - 2026-10-31
 #### Changed
 - Removed automatic player inventory consumption to completely prevent unintended material and sigil drain.
-- Unlocked slot stack limit to `Integer.MAX_VALUE` for Sigils of Reforging (slot 2) and Rarity Materials (slot 1) across all 4 reforging tables (Simple Reforging Table, Reforging Table, Ancient Reforging Table, and Esoteric Reforging Table).
-- Added `FriendlyByteBufMixin` to support VarInt item count encoding/decoding over network packets, seamlessly syncing counts beyond 64 and 127 between client and server.
-- Added `ItemStackHandlerMixin` to serialize counts > 127 into `ExtendedCount` NBT tags, ensuring zero stack loss across game restarts.
-- Enabled infinite stack support during Shift-click quick move (`moveItemStackTo`) via `AbstractContainerMenuMixin`.
+- Unlocked slot stack limit to Integer.MAX_VALUE for Sigils of Reforging (slot 2) and Rarity Materials (slot 1) across all 4 reforging tables (Simple Reforging Table, Reforging Table, Ancient Reforging Table, and Esoteric Reforging Table).
+- Added FriendlyByteBufMixin to support VarInt item count encoding/decoding over network packets, seamlessly syncing counts beyond 64 and 127 between client and server.
+- Added ItemStackHandlerMixin to serialize counts > 127 into ExtendedCount NBT tags, ensuring zero stack loss across game restarts.
+- Enabled infinite stack support during Shift-click quick move (moveItemStackTo) via AbstractContainerMenuMixin.
 
 ### [1.0.0-beta.1] - 2026-10-31
 #### Added
@@ -48,7 +52,7 @@
 ### [1.0.0-alpha.6] - 2026-10-31
 #### Fixed
 - Fixed cost multiplier not scaling on the UI when reforging an item that already possesses the target rarity. The reforge count now naturally defaults to at least 1 (triggering $2^{2-1} = 2\times$ cost on the 2nd reforge of the same rarity tier).
-- Fixed NBT persistence and synchronization: candidate items in `choicesInv` now have reforge counts embedded ahead of time during `slotsChanged`, ensuring reliable tag preservation across Creative and Survival inventory actions.
+- Fixed NBT persistence and synchronization: candidate items in `choicesInv` now have reforge counts embedded ahead of time during `slotsChanged`, ensuring reliable tag preservation across Creative and Survival actions.
 - Client-side menu input slot resolution now prioritizes `getSlot(0)` to ensure real-time cost updates on GUI tooltips.
 
 ### [1.0.0-alpha.5] - 2026-10-31
@@ -73,6 +77,7 @@
 - Initial alpha implementation.
 - Overrides Apothic-Infinite `max_affix_level` to `1.0E300`.
 - Exponential reforge cost multiplier ($2^{\text{count}-1}$).
+- Smart inventory consumption for costs $> 64$.
 - Dynamic item tooltips showing previous reforge count and next cost multiplier.
 
 ---
@@ -80,13 +85,17 @@
 <a name="japanese"></a>
 ## 日本語
 
+### [1.0.0-beta.3] - 2026-10-31
+#### 修正
+- `SlotItemHandlerMixin` の `getMaxStackSize` メソッドインジェクションが Forge 製品環境（難読化/SRG）で `m_6641_` / `m_5866_` にマッチせず、`InvalidInjectionException` でゲーム起動時にクラッシュする不具合を修正（Mixin refmap へのリマップを有効化）。
+
 ### [1.0.0-beta.2] - 2026-10-31
 #### 変更・改善
 - インベントリからの意図しないアフィックス素材や紋章の誤消費を根絶するため、インベントリ自動消費機能を完全廃止。
-- 全4種の再鍛造テーブル（簡易再鍛造台、再鍛造台、古代の再鍛造台、秘術の再鍛造台）において、「再鍛造の紋章」スロットおよび「レアリティマテリアル」スロットのスタック上限を `Integer.MAX_VALUE`（無制限）に開放。スロット内のアイテムからのみ厳密に消費する設計へ変更。
-- ネットワークパケット（`FriendlyByteBuf`）のアイテム個数送受信を VarInt 化し、64個および127個を超える巨大なスタック数がクライアント・サーバー間で正確にリアルタイム同期されるよう対応。
-- `ItemStackHandler` のNBT保存処理に `ExtendedCount` タグサポートを追加し、ワールド保存・再起動時にも127個以上のアイテムスタックが消失しないよう完全保護。
-- `AbstractContainerMenu.moveItemStackTo` をフックし、Shiftクリック（クイック移動）時にもスロット上限までスムーズにアイテムを投入できるよう改善。
+- 全4種の再鍛造テーブル（簡易再鍛造台、再鍛造台、古代の再鍛造台、秘術の再鍛造台）において、「再鍛造の紋章」スロットおよび「レアリティマテリアル」スロットのスタック上限を Integer.MAX_VALUE（無制限）に開放。スロット内のアイテムからのみ厳密に消費する設計へ変更。
+- ネットワークパケット（FriendlyByteBuf）のアイテム個数送受信を VarInt 化し、64個および127個を超える巨大なスタック数がクライアント・サーバー間で正確にリアルタイム同期されるよう対応。
+- ItemStackHandler のNBT保存処理に ExtendedCount タグサポートを追加し、ワールド保存・再起動時にも127個以上のアイテムスタックが消失しないよう完全保護。
+- AbstractContainerMenu.moveItemStackTo をフックし、Shiftクリック（クイック移動）時にもスロット上限までスムーズにアイテムを投入できるよう改善。
 
 ### [1.0.0-beta.1] - 2026-10-31
 #### 追加
@@ -142,4 +151,5 @@
 - 初回アルファ実装。
 - Apothic-Infiniteの `max_affix_level` を `1.0E300` にオーバーライド。
 - 同一レアリティ再鍛造時の指数コストスケール ($2^{\text{回数}-1}$)。
+- 64個超過時のインベントリ自動消費機能。
 - ツールチップへの鍛造回数および次回倍率表示機能。
