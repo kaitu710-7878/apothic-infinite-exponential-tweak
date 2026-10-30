@@ -27,8 +27,10 @@ An addon for **Apotheosis** and **Apothic Infinite** (Minecraft 1.20.1 Forge) th
        - **2nd Reforge:** 1 Sigil, 2 Common Materials
        - **3rd Reforge:** 2 Sigils, 4 Common Materials
        - **4th Reforge:** 4 Sigils, 8 Common Materials
-3. **Smart Inventory Consumption**
-   - If the required item count exceeds the standard slot capacity (e.g. $> 64$), materials and sigils are automatically drawn from the player's inventory, preventing hard locks on high-tier reforging.
+3. **Infinite Stack Reforging Slots (No Inventory Drain)**
+   - To completely eliminate accidental material consumption from player inventories, automatic inventory draining has been removed.
+   - Instead, the stack limit for **Sigils of Reforging** and **Rarity Materials** slots across all 4 reforging tables (Simple Reforging Table, Reforging Table, Ancient Reforging Table, and Esoteric Reforging Table) is unlocked to `Integer.MAX_VALUE`.
+   - Players can stack hundreds or thousands of materials directly inside the table slots. Reforging operations strictly consume items placed in the table slots only.
 4. **Item Tooltips & Visual Feedback**
    - Shows the previous reforge count and next cost multiplier on item tooltips.
    - Reforge table interface clearly displays current scaled costs in real-time.
@@ -66,8 +68,10 @@ Minecraft 1.20.1 Forge環境向け、**Apotheosis** および **Apothic Infinite
        - **2回目（再鍛造）:** 紋章 **1個**、コモンマテリアル **2個**
        - **3回目（再鍛造）:** 紋章 **2個**、コモンマテリアル **4個**
        - **4回目（再鍛造）:** 紋章 **4個**、コモンマテリアル **8個**
-3. **インベントリ自動消費機能 (Smart Inventory Consumption)**
-   - コストがスロット上限（64個）を超過した場合でも、不足分のマテリアルや紋章をプレイヤーの所持インベントリから自動的に消費して鍛造を実行できます。
+3. **再鍛造テーブルスロットのスタック上限無制限化（インベントリ誤消費の根絶）**
+   - インベントリからの意図しない素材消費事故を完全に防ぐため、インベントリからの自動消費仕様を廃止しました。
+   - 代わりに、全4種の再鍛造台（簡易再鍛造台、再鍛造台、古代の再鍛造台、秘術の再鍛造台）において、「再鍛造の紋章」スロットおよび「レアリティマテリアル」スロットのスタック上限を `Integer.MAX_VALUE`（実質無制限）に拡張しました。
+   - プレイヤーはスロット内に64個を超えて何百・何千個もの素材を直接スタックして投入でき、鍛造コストはスロット内の素材からのみ安全に消費されます。
 4. **ツールチップ＆UI情報表示**
    - アイテムのツールチップに、現在のレアリティにおける鍛造回数と次回鍛造時のコスト倍率を表示します。
    - 再鍛造台のGUI上でも正確な必要個数が赤色/灰色でリアルタイム表示されます。

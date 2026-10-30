@@ -12,7 +12,12 @@
     "BlockEntityMenuAccessor",
     "AncientReforgingMenuMixin",
     "EsotericReforgingMenuMixin",
-    "AffixMergerMixin"
+    "AffixMergerMixin",
+    "SlotItemHandlerMixin",
+    "SlotMixin",
+    "FriendlyByteBufMixin",
+    "ItemStackHandlerMixin",
+    "AbstractContainerMenuMixin"
   ],
   "client": [
   ],

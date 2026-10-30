@@ -17,7 +17,6 @@ The server configuration file is saved at `config/apothic_infinite_exponential_t
 | `scale_sigil_cost` | `Boolean` | `true` | Whether the Sigils of Reforging (Sigil of Rebirth) cost scales exponentially on repeated reforges. |
 | `scale_material_cost` | `Boolean` | `true` | Whether the rarity materials cost scales exponentially on repeated reforges. |
 | `max_cost_cap` | `Integer` | `64000` | The maximum cost cap for items per reforge operation to prevent unintended overflow. |
-| `enable_inventory_consumption` | `Boolean` | `true` | If true, when the required item count exceeds the table slot stack size (64), remaining items will be consumed from the player's inventory. |
 | `reset_count_on_rarity_change` | `Boolean` | `false` | If true, reforging with a different rarity tier resets the reforge count. If false (default), reforge counts are tracked separately per rarity tier. |
 | `show_reforge_count_tooltip` | `Boolean` | `true` | Whether to display the reforge count and next cost multiplier on item tooltips. |
 
@@ -36,6 +35,5 @@ The server configuration file is saved at `config/apothic_infinite_exponential_t
 | `scale_sigil_cost` | `Boolean` | `true` | trueの場合、再鍛造の紋章（Sigil of Rebirth）の必要数を指数関数的に増加させます。 |
 | `scale_material_cost` | `Boolean` | `true` | trueの場合、レアリティマテリアルの必要数を指数関数的に増加させます。 |
 | `max_cost_cap` | `Integer` | `64000` | 1回の鍛造で要求される素材数の最大上限値（整数オーバーフローや極端な過大請求を防止）。 |
-| `enable_inventory_consumption` | `Boolean` | `true` | trueの場合、必要コストがスロットのスタック上限（64個）を超えた際に、不足分をプレイヤーのインベントリから自動消費します。 |
 | `reset_count_on_rarity_change` | `Boolean` | `false` | trueの場合、異なるレアリティで鍛造すると回数がリセットされます。false（推奨）の場合、レアリティごとに個別に鍛造回数が保持されます。 |
 | `show_reforge_count_tooltip` | `Boolean` | `true` | trueの場合、アイテムのツールチップに鍛造回数と次回コスト倍率を表示します。 |

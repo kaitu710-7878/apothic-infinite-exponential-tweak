@@ -13,7 +13,6 @@ public class ExponentialTweakConfig {
     public static final ForgeConfigSpec.BooleanValue SCALE_SIGIL_COST;
     public static final ForgeConfigSpec.BooleanValue SCALE_MATERIAL_COST;
     public static final ForgeConfigSpec.IntValue MAX_COST_CAP;
-    public static final ForgeConfigSpec.BooleanValue ENABLE_INVENTORY_CONSUMPTION;
     public static final ForgeConfigSpec.BooleanValue RESET_COUNT_ON_RARITY_CHANGE;
     public static final ForgeConfigSpec.BooleanValue SHOW_REFORGE_COUNT_TOOLTIP;
 
@@ -54,11 +53,6 @@ public class ExponentialTweakConfig {
                         "The maximum item cost cap per reforge operation to prevent unintended overflow.",
                         "Default is 64000.")
                 .defineInRange("max_cost_cap", 64000, 1, Integer.MAX_VALUE);
-
-        ENABLE_INVENTORY_CONSUMPTION = BUILDER.comment(
-                        "If true, when required material or sigil count exceeds the reforge slot stack size (e.g. > 64),",
-                        "the remaining items will be consumed automatically from the player's inventory.")
-                .define("enable_inventory_consumption", true);
 
         RESET_COUNT_ON_RARITY_CHANGE = BUILDER.comment(
                         "If true, reforging with a different rarity tier resets the reforge count.",
