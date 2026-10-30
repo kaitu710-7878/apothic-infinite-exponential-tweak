@@ -1,0 +1,315 @@
+package com.yutaka.apothic_infinite_exponential_tweak.util;
+
+import com.yutaka.apothic_infinite_exponential_tweak.config.ExponentialTweakConfig;
+import dev.shadowsoffire.apotheosis.adventure.affix.AffixHelper;
+import dev.shadowsoffire.apotheosis.adventure.loot.LootRarity;
+import dev.shadowsoffire.apotheosis.adventure.loot.RarityRegistry;
+import dev.shadowsoffire.placebo.reload.DynamicHolder;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+
+public class ExponentialCostHelper {
+    public static final String TAG_ROOT = "ApothicExponential";
+    public static final String TAG_CURRENT_COUNT = "apo_exp_current_count";
+    public static final String TAG_CURRENT_RARITY = "apo_exp_current_rarity";
+    public static final String TAG_RARITY_PREFIX = "apo_exp_count_";
+    public static final String TAG_RARITY_COUNTS = "RarityCounts";
+
+    /**
+     * Normalizes a rarity ID string (e.g. "common" -> "apotheosis:common").
+     */
+    public static String normalizeRarityId(String id) {
+        if (id == null || id.isEmpty()) return "";
+        id = id.trim().toLowerCase();
+        if (!id.contains(":")) {
+            return "apotheosis:" + id;
+        }
+        return id;
+    }
+
+    /**
+     * Resolves the normalized rarity ID for a LootRarity instance.
+     */
+    public static String getRarityId(LootRarity rarity) {
+        if (rarity == null) return "";
+        try {
+            DynamicHolder<LootRarity> holder = RarityRegistry.INSTANCE.holder(rarity);
+            if (holder != null && holder.isBound()) {
+                return normalizeRarityId(holder.getId().toString());
+            }
+        } catch (Throwable ignored) {
+        }
+        ResourceLocation key = RarityRegistry.INSTANCE.getKey(rarity);
+        if (key != null) {
+            return normalizeRarityId(key.toString());
+        }
+        return "";
+    }
+
+    /**
+     * Directly extracts the rarity ID of an ItemStack from affix_data NBT.
+     */
+    public static String getItemRarityId(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return "";
+
+        if (stack.hasTag()) {
+            CompoundTag tag = stack.getTag();
+            if (tag != null && tag.contains(AffixHelper.AFFIX_DATA)) {
+                CompoundTag afxData = tag.getCompound(AffixHelper.AFFIX_DATA);
+                if (afxData.contains(AffixHelper.RARITY)) {
+                    String r = afxData.getString(AffixHelper.RARITY);
+                    if (!r.isEmpty()) {
+                        return normalizeRarityId(r);
+                    }
+                }
+            }
+        }
+
+        try {
+            DynamicHolder<LootRarity> holder = AffixHelper.getRarity(stack);
+            if (holder != null && holder.isBound()) {
+                return normalizeRarityId(holder.getId().toString());
+            }
+        } catch (Throwable ignored) {
+        }
+
+        return "";
+    }
+
+    /**
+     * Checks if an item currently has the same rarity tier as targetRarity.
+     */
+    public static boolean isSameRarity(ItemStack stack, LootRarity targetRarity) {
+        if (stack == null || stack.isEmpty() || targetRarity == null) return false;
+
+        String itemRarity = getItemRarityId(stack);
+        String targetId = getRarityId(targetRarity);
+
+        if (!itemRarity.isEmpty() && !targetId.isEmpty()) {
+            if (itemRarity.equals(targetId)) return true;
+        }
+
+        try {
+            DynamicHolder<LootRarity> currentHolder = AffixHelper.getRarity(stack);
+            if (currentHolder != null && currentHolder.isBound()) {
+                LootRarity current = currentHolder.get();
+                if (current != null) {
+                    if (current == targetRarity || current.ordinal() == targetRarity.ordinal()) {
+                        return true;
+                    }
+                    if (current.getMaterial() != null && targetRarity.getMaterial() != null) {
+                        if (current.getMaterial() == targetRarity.getMaterial()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets how many times this item has already been reforged at the given target rarity tier.
+     */
+    public static int getReforgeCountForRarity(ItemStack stack, LootRarity rarity) {
+        if (stack == null || stack.isEmpty() || rarity == null) return 0;
+
+        String targetRarityId = getRarityId(rarity);
+        boolean matchesRarity = isSameRarity(stack, rarity);
+
+        if (stack.hasTag()) {
+            CompoundTag tag = stack.getTag();
+            if (tag != null) {
+                // 1. Direct per-rarity tag inside affix_data
+                if (tag.contains(AffixHelper.AFFIX_DATA)) {
+                    CompoundTag afxData = tag.getCompound(AffixHelper.AFFIX_DATA);
+                    if (!targetRarityId.isEmpty() && afxData.contains(TAG_RARITY_PREFIX + targetRarityId)) {
+                        return afxData.getInt(TAG_RARITY_PREFIX + targetRarityId);
+                    }
+                    if (matchesRarity && afxData.contains(TAG_CURRENT_COUNT)) {
+                        return afxData.getInt(TAG_CURRENT_COUNT);
+                    }
+                }
+
+                // 2. Direct per-rarity tag inside ApothicExponential
+                if (tag.contains(TAG_ROOT)) {
+                    CompoundTag expTag = tag.getCompound(TAG_ROOT);
+                    if (expTag.contains(TAG_RARITY_COUNTS)) {
+                        CompoundTag counts = expTag.getCompound(TAG_RARITY_COUNTS);
+                        if (!targetRarityId.isEmpty() && counts.contains(targetRarityId)) {
+                            return counts.getInt(targetRarityId);
+                        }
+                    }
+                    if (matchesRarity && expTag.contains(TAG_CURRENT_COUNT)) {
+                        return expTag.getInt(TAG_CURRENT_COUNT);
+                    }
+                }
+            }
+        }
+
+        // Fallback: If item currently has this rarity tier but has no count recorded,
+        // it has already been reforged at least 1 time!
+        if (matchesRarity) {
+            // Count existing affixes as lower-bound heuristic if available
+            try {
+                int afxCount = AffixHelper.getAffixes(stack).size();
+                return Math.max(1, afxCount);
+            } catch (Throwable ignored) {
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * Calculates the exponential cost multiplier for the next reforge operation.
+     */
+    public static double getCostMultiplier(ItemStack input, LootRarity targetRarity) {
+        if (input == null || input.isEmpty() || targetRarity == null) {
+            return 1.0;
+        }
+
+        int previousCount = getReforgeCountForRarity(input, targetRarity);
+        if (previousCount <= 0) {
+            return 1.0;
+        }
+
+        double base = ExponentialTweakConfig.BASE_EXPONENT.get();
+        return Math.pow(base, previousCount);
+    }
+
+    /**
+     * Computes the scaled Sigil of Reforging (Sigil of Rebirth) cost.
+     */
+    public static int computeSigilCost(int baseCost, ItemStack input, LootRarity rarity) {
+        if (!ExponentialTweakConfig.SCALE_SIGIL_COST.get() || input == null || input.isEmpty() || rarity == null) {
+            return baseCost;
+        }
+
+        int previousCount = getReforgeCountForRarity(input, rarity);
+        if (previousCount <= 0) {
+            // First reforge of this rarity tier: keep base recipe cost (0 for common)
+            return baseCost;
+        }
+
+        // For 2nd and subsequent reforges of the same rarity tier:
+        // If base cost was 0 (Common), treat effective base as 1 Sigil so 2nd reforge requires 1, 3rd requires 2, etc.
+        int effectiveBase = (baseCost <= 0) ? 1 : baseCost;
+        double mult = Math.pow(ExponentialTweakConfig.BASE_EXPONENT.get(), previousCount - (baseCost <= 0 ? 1 : 0));
+        long scaled = Math.round(effectiveBase * mult);
+        int cap = ExponentialTweakConfig.MAX_COST_CAP.get();
+        return (int) Math.min((long) cap, Math.max(effectiveBase, scaled));
+    }
+
+    /**
+     * Computes the scaled Rarity Material cost.
+     */
+    public static int computeMatCost(int baseCost, ItemStack input, LootRarity rarity) {
+        if (baseCost <= 0) return 0;
+        if (!ExponentialTweakConfig.SCALE_MATERIAL_COST.get() || input == null || input.isEmpty() || rarity == null) {
+            return baseCost;
+        }
+        double mult = getCostMultiplier(input, rarity);
+        long scaled = Math.round(baseCost * mult);
+        int cap = ExponentialTweakConfig.MAX_COST_CAP.get();
+        return (int) Math.min((long) cap, Math.max(baseCost, scaled));
+    }
+
+    /**
+     * Records the new reforge count onto the output ItemStack's NBT.
+     */
+    public static void recordReforgeSuccess(ItemStack output, LootRarity rarity, int newCount) {
+        if (output == null || output.isEmpty() || rarity == null) return;
+
+        String rarityId = getRarityId(rarity);
+
+        // 1. Write to Apotheosis native affix_data compound
+        CompoundTag afxData = output.getOrCreateTagElement(AffixHelper.AFFIX_DATA);
+        afxData.putInt(TAG_CURRENT_COUNT, newCount);
+        afxData.putString(TAG_CURRENT_RARITY, rarityId);
+        if (!rarityId.isEmpty()) {
+            afxData.putInt(TAG_RARITY_PREFIX + rarityId, newCount);
+        }
+
+        // 2. Write to ApothicExponential tag
+        CompoundTag expTag = output.getOrCreateTagElement(TAG_ROOT);
+        expTag.putInt(TAG_CURRENT_COUNT, newCount);
+        expTag.putString(TAG_CURRENT_RARITY, rarityId);
+        if (!rarityId.isEmpty()) {
+            CompoundTag counts = expTag.getCompound(TAG_RARITY_COUNTS);
+            counts.putInt(rarityId, newCount);
+            expTag.put(TAG_RARITY_COUNTS, counts);
+        }
+    }
+
+    /**
+     * Calculates the new count from input and writes it onto output.
+     */
+    public static void recordReforgeSuccess(ItemStack output, ItemStack input, LootRarity rarity) {
+        if (output == null || output.isEmpty() || rarity == null) return;
+        int previousCount = getReforgeCountForRarity(input, rarity);
+        recordReforgeSuccess(output, rarity, previousCount + 1);
+    }
+
+    /**
+     * Checks if player has enough items across the slot and inventory.
+     */
+    public static boolean hasEnoughItems(Player player, ItemStack slotStack, int totalCost) {
+        if (player.isCreative()) return true;
+        if (totalCost <= 0) return true;
+        if (slotStack.isEmpty()) return false;
+
+        int slotCount = slotStack.getCount();
+        if (slotCount >= totalCost) return true;
+
+        if (!ExponentialTweakConfig.ENABLE_INVENTORY_CONSUMPTION.get()) {
+            return false;
+        }
+
+        Item item = slotStack.getItem();
+        int totalAvailable = slotCount;
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            ItemStack invStack = player.getInventory().getItem(i);
+            if (!invStack.isEmpty() && invStack.getItem() == item) {
+                totalAvailable += invStack.getCount();
+                if (totalAvailable >= totalCost) return true;
+            }
+        }
+
+        return totalAvailable >= totalCost;
+    }
+
+    /**
+     * Consumes items first from slot, then from player's inventory if enabled.
+     */
+    public static void consumeItems(Player player, Slot slot, int totalCost) {
+        if (player.isCreative() || totalCost <= 0) return;
+
+        ItemStack slotStack = slot.getItem();
+        if (slotStack.isEmpty()) return;
+
+        Item targetItem = slotStack.getItem();
+        int fromSlot = Math.min(slotStack.getCount(), totalCost);
+        slotStack.shrink(fromSlot);
+        int remaining = totalCost - fromSlot;
+
+        if (remaining > 0 && ExponentialTweakConfig.ENABLE_INVENTORY_CONSUMPTION.get()) {
+            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+                ItemStack invStack = player.getInventory().getItem(i);
+                if (!invStack.isEmpty() && invStack.getItem() == targetItem) {
+                    int toShrink = Math.min(invStack.getCount(), remaining);
+                    invStack.shrink(toShrink);
+                    remaining -= toShrink;
+                    if (remaining <= 0) break;
+                }
+            }
+        }
+    }
+}
