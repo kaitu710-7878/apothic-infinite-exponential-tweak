@@ -1,7 +1,9 @@
 package com.yutaka.apothic_infinite_exponential_tweak.util;
 
 import com.yutaka.apothic_infinite_exponential_tweak.config.ExponentialTweakConfig;
+import dev.shadowsoffire.apotheosis.adventure.affix.Affix;
 import dev.shadowsoffire.apotheosis.adventure.affix.AffixHelper;
+import dev.shadowsoffire.apotheosis.adventure.affix.AffixInstance;
 import dev.shadowsoffire.apotheosis.adventure.loot.LootRarity;
 import dev.shadowsoffire.apotheosis.adventure.loot.RarityRegistry;
 import dev.shadowsoffire.placebo.reload.DynamicHolder;
@@ -276,5 +278,97 @@ public class ExponentialCostHelper {
         if (!slotStack.isEmpty()) {
             slotStack.shrink(totalCost);
         }
+    }
+
+    // ==========================================
+    // Augmenting Table Tweak Methods
+    // ==========================================
+    public static final String TAG_AUGMENT_PREFIX = "apo_exp_aug_";
+
+    /**
+     * Resolves an affix identifier string (e.g., "apotheosis:crit_chance").
+     */
+    public static String getAffixId(DynamicHolder<? extends Affix> affixHolder) {
+        if (affixHolder == null) return "";
+        ResourceLocation id = affixHolder.getId();
+        return id != null ? id.toString() : "";
+    }
+
+    /**
+     * Gets how many times this specific affix has been augmented beyond the default level (1.0F).
+     */
+    public static int getAugmentOverCount(ItemStack stack, AffixInstance inst) {
+        if (stack == null || stack.isEmpty() || inst == null) return 0;
+        String affixId = getAffixId(inst.affix());
+        if (affixId.isEmpty()) return 0;
+
+        String key = TAG_AUGMENT_PREFIX + affixId.replace(':', '_');
+
+        // 1. Check affix_data
+        if (stack.hasTag()) {
+            CompoundTag tag = stack.getTag();
+            if (tag != null && tag.contains(AffixHelper.AFFIX_DATA)) {
+                CompoundTag afxData = tag.getCompound(AffixHelper.AFFIX_DATA);
+                if (afxData.contains(key)) {
+                    return Math.max(0, afxData.getInt(key));
+                }
+            }
+            if (tag != null && tag.contains(TAG_ROOT)) {
+                CompoundTag expTag = tag.getCompound(TAG_ROOT);
+                if (expTag.contains(key)) {
+                    return Math.max(0, expTag.getInt(key));
+                }
+            }
+        }
+
+        // 2. Fallback: estimate from current level
+        float currentLevel = inst.level();
+        if (currentLevel > 1.0F + 1e-4F) {
+            float excess = currentLevel - 1.0F;
+            return Math.max(0, Math.round(excess / 0.25F));
+        }
+
+        return 0;
+    }
+
+    /**
+     * Computes the Sigil of Enhancement cost to upgrade an affix.
+     * Base vanilla cost is 2 sigils.
+     * When current level < 1.0F: 2 sigils.
+     * When current level >= 1.0F: 2 * (multiplier ^ (overCount + 1)), e.g. 4, 8, 16, 32...
+     */
+    public static int computeAugmentUpgradeCost(ItemStack stack, AffixInstance inst) {
+        if (inst == null || inst.level() < 1.0F - 1e-4F) {
+            return 2; // Vanilla base cost
+        }
+
+        if (!ExponentialTweakConfig.SCALE_AUGMENT_COST.get()) {
+            return 2;
+        }
+
+        int overCount = getAugmentOverCount(stack, inst);
+        double exponent = ExponentialTweakConfig.AUGMENT_BASE_EXPONENT.get();
+        double mult = Math.pow(exponent, overCount + 1);
+        long scaled = Math.round(2.0 * mult);
+        int cap = ExponentialTweakConfig.MAX_COST_CAP.get();
+        return (int) Math.min((long) cap, Math.max(2L, scaled));
+    }
+
+    /**
+     * Records a successful augment upgrade onto the ItemStack's NBT.
+     */
+    public static void recordAugmentSuccess(ItemStack stack, AffixInstance inst) {
+        if (stack == null || stack.isEmpty() || inst == null) return;
+        String affixId = getAffixId(inst.affix());
+        if (affixId.isEmpty()) return;
+
+        int newCount = getAugmentOverCount(stack, inst) + 1;
+        String key = TAG_AUGMENT_PREFIX + affixId.replace(':', '_');
+
+        CompoundTag afxData = stack.getOrCreateTagElement(AffixHelper.AFFIX_DATA);
+        afxData.putInt(key, newCount);
+
+        CompoundTag expTag = stack.getOrCreateTagElement(TAG_ROOT);
+        expTag.putInt(key, newCount);
     }
 }

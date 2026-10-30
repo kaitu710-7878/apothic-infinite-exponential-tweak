@@ -17,9 +17,12 @@
     "SlotMixin",
     "FriendlyByteBufMixin",
     "ItemStackHandlerMixin",
-    "AbstractContainerMenuMixin"
+    "AbstractContainerMenuMixin",
+    "AugmentingMenuMixin"
   ],
   "client": [
+    "AugmentingScreenMixin",
+    "FatTexButtonMixin"
   ],
   "injectors": {
     "defaultRequire": 1

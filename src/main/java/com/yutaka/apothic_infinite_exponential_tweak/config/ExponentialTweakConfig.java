@@ -14,7 +14,10 @@ public class ExponentialTweakConfig {
     public static final ForgeConfigSpec.BooleanValue SCALE_MATERIAL_COST;
     public static final ForgeConfigSpec.IntValue MAX_COST_CAP;
     public static final ForgeConfigSpec.BooleanValue RESET_COUNT_ON_RARITY_CHANGE;
+    public static final ForgeConfigSpec.BooleanValue SCALE_AUGMENT_COST;
+    public static final ForgeConfigSpec.DoubleValue AUGMENT_BASE_EXPONENT;
     public static final ForgeConfigSpec.BooleanValue SHOW_REFORGE_COUNT_TOOLTIP;
+    public static final ForgeConfigSpec.BooleanValue SHOW_AUGMENT_TOOLTIP;
 
     static {
         BUILDER.comment("==================================================",
@@ -60,10 +63,27 @@ public class ExponentialTweakConfig {
                 .define("reset_count_on_rarity_change", false);
         BUILDER.pop();
 
+        BUILDER.push("Augmenting Table Scaling");
+        SCALE_AUGMENT_COST = BUILDER.comment(
+                        "If true, upgrades beyond the default max level (1.0F) at the Augmenting Table",
+                        "will exponentially increase the required Sigils of Enhancement.")
+                .define("scale_augment_cost", true);
+
+        AUGMENT_BASE_EXPONENT = BUILDER.comment(
+                        "The exponential multiplier for Augmenting Table upgrades beyond 1.0F.",
+                        "Formula: cost = 2 * (base ^ (over_level_count + 1)), e.g. 4, 8, 16, 32, 64...",
+                        "Default is 2.0 (doubles each upgrade).")
+                .defineInRange("augment_base_exponent", 2.0, 1.0, 10.0);
+        BUILDER.pop();
+
         BUILDER.push("Display & Tooltips");
         SHOW_REFORGE_COUNT_TOOLTIP = BUILDER.comment(
                         "If true, displays the reforge count and next cost multiplier on item tooltips.")
                 .define("show_reforge_count_tooltip", true);
+
+        SHOW_AUGMENT_TOOLTIP = BUILDER.comment(
+                        "If true, displays the over-level augment upgrade count on item tooltips.")
+                .define("show_augment_tooltip", true);
         BUILDER.pop();
 
         BUILDER.pop();
