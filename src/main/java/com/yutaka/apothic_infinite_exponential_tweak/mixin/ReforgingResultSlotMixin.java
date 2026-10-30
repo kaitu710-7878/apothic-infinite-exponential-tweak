@@ -26,7 +26,7 @@ public abstract class ReforgingResultSlotMixin extends SlotItemHandler {
     }
 
     @Inject(method = "mayPickup", at = @At("HEAD"), cancellable = true, remap = true)
-    private void apoExp$checkPickupWithInventory(Player playerIn, CallbackInfoReturnable<Boolean> cir) {
+    private void apoExp$checkPickupSlotOnly(Player playerIn, CallbackInfoReturnable<Boolean> cir) {
         if (!(playerIn.containerMenu instanceof ReforgingMenu menu)) {
             return;
         }
@@ -65,8 +65,11 @@ public abstract class ReforgingResultSlotMixin extends SlotItemHandler {
             return;
         }
 
-        boolean hasSigils = ExponentialCostHelper.hasEnoughItems(playerIn, menu.getSlot(2).getItem(), sigilCost);
-        boolean hasMats = ExponentialCostHelper.hasEnoughItems(playerIn, menu.getSlot(1).getItem(), matCost);
+        ItemStack matStack = menu.getSlot(1).getItem();
+        ItemStack sigilStack = menu.getSlot(2).getItem();
+
+        boolean hasMats = matCost <= 0 || (!matStack.isEmpty() && matStack.getCount() >= matCost);
+        boolean hasSigils = sigilCost <= 0 || (!sigilStack.isEmpty() && sigilStack.getCount() >= sigilCost);
 
         if (!hasSigils || !hasMats) {
             cir.setReturnValue(false);
@@ -102,8 +105,12 @@ public abstract class ReforgingResultSlotMixin extends SlotItemHandler {
                 int matCost = menu.getMatCost(this.getSlotIndex());
                 int levelCost = menu.getLevelCost(this.getSlotIndex());
 
-                ExponentialCostHelper.consumeItems(player, menu.getSlot(1), matCost);
-                ExponentialCostHelper.consumeItems(player, menu.getSlot(2), sigilCost);
+                if (matCost > 0) {
+                    menu.getSlot(1).getItem().shrink(matCost);
+                }
+                if (sigilCost > 0) {
+                    menu.getSlot(2).getItem().shrink(sigilCost);
+                }
 
                 EnchantmentUtils.chargeExperience(player, ApothMiscUtil.getExpCostForSlot(levelCost, this.getSlotIndex()));
             }

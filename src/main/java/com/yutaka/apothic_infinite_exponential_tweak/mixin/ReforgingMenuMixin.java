@@ -1,11 +1,15 @@
 package com.yutaka.apothic_infinite_exponential_tweak.mixin;
 
 import com.yutaka.apothic_infinite_exponential_tweak.util.ExponentialCostHelper;
+import com.yutaka.apothic_infinite_exponential_tweak.util.IExtendedSlot;
 import dev.shadowsoffire.apotheosis.adventure.affix.reforging.ReforgingMenu;
 import dev.shadowsoffire.apotheosis.adventure.loot.LootRarity;
 import dev.shadowsoffire.placebo.cap.InternalItemHandler;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,6 +32,21 @@ public abstract class ReforgingMenuMixin {
     @Shadow(remap = false)
     @Nullable
     public abstract LootRarity getRarity();
+
+    @Inject(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/core/BlockPos;)V", at = @At("RETURN"), remap = false)
+    private void apoExp$enableInfiniteSlots(int id, Inventory pInv, BlockPos pos, CallbackInfo ci) {
+        AbstractContainerMenu menu = (AbstractContainerMenu) (Object) this;
+        if (menu.slots.size() > 2) {
+            Slot matSlot = menu.getSlot(1);
+            Slot sigilSlot = menu.getSlot(2);
+            if (matSlot instanceof IExtendedSlot ext) {
+                ext.apoExp$setInfiniteStack(true);
+            }
+            if (sigilSlot instanceof IExtendedSlot ext) {
+                ext.apoExp$setInfiniteStack(true);
+            }
+        }
+    }
 
     private ItemStack apoExp$getInputItem() {
         try {

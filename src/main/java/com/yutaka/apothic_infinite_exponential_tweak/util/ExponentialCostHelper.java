@@ -9,7 +9,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 public class ExponentialCostHelper {
@@ -259,57 +258,23 @@ public class ExponentialCostHelper {
     }
 
     /**
-     * Checks if player has enough items across the slot and inventory.
+     * Checks if player has enough items directly in the slot.
      */
     public static boolean hasEnoughItems(Player player, ItemStack slotStack, int totalCost) {
         if (player.isCreative()) return true;
         if (totalCost <= 0) return true;
         if (slotStack.isEmpty()) return false;
-
-        int slotCount = slotStack.getCount();
-        if (slotCount >= totalCost) return true;
-
-        if (!ExponentialTweakConfig.ENABLE_INVENTORY_CONSUMPTION.get()) {
-            return false;
-        }
-
-        Item item = slotStack.getItem();
-        int totalAvailable = slotCount;
-        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-            ItemStack invStack = player.getInventory().getItem(i);
-            if (!invStack.isEmpty() && invStack.getItem() == item) {
-                totalAvailable += invStack.getCount();
-                if (totalAvailable >= totalCost) return true;
-            }
-        }
-
-        return totalAvailable >= totalCost;
+        return slotStack.getCount() >= totalCost;
     }
 
     /**
-     * Consumes items first from slot, then from player's inventory if enabled.
+     * Consumes items directly from the slot.
      */
     public static void consumeItems(Player player, Slot slot, int totalCost) {
         if (player.isCreative() || totalCost <= 0) return;
-
         ItemStack slotStack = slot.getItem();
-        if (slotStack.isEmpty()) return;
-
-        Item targetItem = slotStack.getItem();
-        int fromSlot = Math.min(slotStack.getCount(), totalCost);
-        slotStack.shrink(fromSlot);
-        int remaining = totalCost - fromSlot;
-
-        if (remaining > 0 && ExponentialTweakConfig.ENABLE_INVENTORY_CONSUMPTION.get()) {
-            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-                ItemStack invStack = player.getInventory().getItem(i);
-                if (!invStack.isEmpty() && invStack.getItem() == targetItem) {
-                    int toShrink = Math.min(invStack.getCount(), remaining);
-                    invStack.shrink(toShrink);
-                    remaining -= toShrink;
-                    if (remaining <= 0) break;
-                }
-            }
+        if (!slotStack.isEmpty()) {
+            slotStack.shrink(totalCost);
         }
     }
 }
