@@ -7,6 +7,12 @@
 <a name="english"></a>
 ## English
 
+### [1.1.1] - 2026-10-31
+#### Fixed
+- Fixed an issue where items reforged/merged via Apothic-Infinite (having affix levels >= 1.0F from reforges) were falsely penalized with exorbitant augment costs upon first entering the Augmenting Table.
+- Augment cost doubling now strictly tracks the actual number of upgrades performed at the Augmenting Table beyond the Apotheosis default maximum level (1.0F), accurately scaling $2 \times 2^{\text{overCount}+1}$ (1st breakthrough: 4 sigils, 2nd: 8 sigils, etc.) without guessing from initial affix levels.
+- Item tooltips now strictly display the true Augment Table breakthrough count.
+
 ### [1.1.0] - 2026-10-31
 #### Added
 - Added exponential cost scaling for Augmenting Table (Sigil of Enhancement) upgrades beyond the default maximum level (1.0F): 1st breakthrough (1.00F -> 1.25F) requires 4 sigils ($2 \times 2^1$), 2nd requires 8 sigils ($2 \times 2^2$), 3rd requires 16 sigils ($2 \times 2^3$), doubling exponentially. Normal upgrades (< 1.0F) remain at vanilla cost (2 sigils).
@@ -112,6 +118,12 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.1.1] - 2026-10-31
+#### 修正
+- Apothic-Infinite の再鍛造（アフィックス合成）によってアフィックスレベルが 1.0F 以上になっていたアイテムを補強テーブルに入れた際、未補強にもかかわらず補強回数が誤推定されて高額なコストが要求される不具合を修正。
+- 補強テーブルでの指数関数コスト倍化の判定を、アフィックスの初期レベルからの推測を廃止し、「補強テーブルで Apotheosis のデフォルト最大値（1.0F）を超えて実際に強化した回数」にのみ基づいて $2 \times 2^{\text{突破回数}+1}$（1回目: 4個、2回目: 8個、3回目: 16個...）とスケールするよう根本修正。
+- アイテムツールチップの上限突破回数表示も、補強テーブルでの実際の突破実績回数のみを正確にカウント・表示するように修正。
 
 ### [1.1.0] - 2026-10-31
 #### 追加・新機能

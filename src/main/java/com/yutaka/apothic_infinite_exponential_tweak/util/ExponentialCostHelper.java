@@ -296,6 +296,8 @@ public class ExponentialCostHelper {
 
     /**
      * Gets how many times this specific affix has been augmented beyond the default level (1.0F).
+     * Strictly reads from the recorded NBT tag, never estimating from current affix level
+     * so that items reforged/merged via Apothic-Infinite are not falsely penalized.
      */
     public static int getAugmentOverCount(ItemStack stack, AffixInstance inst) {
         if (stack == null || stack.isEmpty() || inst == null) return 0;
@@ -304,28 +306,23 @@ public class ExponentialCostHelper {
 
         String key = TAG_AUGMENT_PREFIX + affixId.replace(':', '_');
 
-        // 1. Check affix_data
+        // Check affix_data
         if (stack.hasTag()) {
             CompoundTag tag = stack.getTag();
-            if (tag != null && tag.contains(AffixHelper.AFFIX_DATA)) {
-                CompoundTag afxData = tag.getCompound(AffixHelper.AFFIX_DATA);
-                if (afxData.contains(key)) {
-                    return Math.max(0, afxData.getInt(key));
+            if (tag != null) {
+                if (tag.contains(AffixHelper.AFFIX_DATA)) {
+                    CompoundTag afxData = tag.getCompound(AffixHelper.AFFIX_DATA);
+                    if (afxData.contains(key)) {
+                        return Math.max(0, afxData.getInt(key));
+                    }
+                }
+                if (tag.contains(TAG_ROOT)) {
+                    CompoundTag expTag = tag.getCompound(TAG_ROOT);
+                    if (expTag.contains(key)) {
+                        return Math.max(0, expTag.getInt(key));
+                    }
                 }
             }
-            if (tag != null && tag.contains(TAG_ROOT)) {
-                CompoundTag expTag = tag.getCompound(TAG_ROOT);
-                if (expTag.contains(key)) {
-                    return Math.max(0, expTag.getInt(key));
-                }
-            }
-        }
-
-        // 2. Fallback: estimate from current level
-        float currentLevel = inst.level();
-        if (currentLevel > 1.0F + 1e-4F) {
-            float excess = currentLevel - 1.0F;
-            return Math.max(0, Math.round(excess / 0.25F));
         }
 
         return 0;
@@ -334,8 +331,9 @@ public class ExponentialCostHelper {
     /**
      * Computes the Sigil of Enhancement cost to upgrade an affix.
      * Base vanilla cost is 2 sigils.
-     * When current level < 1.0F: 2 sigils.
-     * When current level >= 1.0F: 2 * (multiplier ^ (overCount + 1)), e.g. 4, 8, 16, 32...
+     * When current level < 1.0F: 2 sigils (normal augment within default bounds).
+     * When current level >= 1.0F: 2 * (base ^ (overCount + 1)), e.g. 4, 8, 16, 32...
+     * (1st upgrade beyond default costs 4, doubling with each subsequent beyond-default augment).
      */
     public static int computeAugmentUpgradeCost(ItemStack stack, AffixInstance inst) {
         if (inst == null || inst.level() < 1.0F - 1e-4F) {
@@ -356,13 +354,20 @@ public class ExponentialCostHelper {
 
     /**
      * Records a successful augment upgrade onto the ItemStack's NBT.
+     * Only increments the beyond-default augment count if the affix was already at or above 1.0F
+     * prior to this upgrade.
      */
-    public static void recordAugmentSuccess(ItemStack stack, AffixInstance inst) {
-        if (stack == null || stack.isEmpty() || inst == null) return;
-        String affixId = getAffixId(inst.affix());
+    public static void recordAugmentSuccess(ItemStack stack, AffixInstance prevInst) {
+        if (stack == null || stack.isEmpty() || prevInst == null) return;
+        if (prevInst.level() < 1.0F - 1e-4F) {
+            // Normal augment up to the default maximum level (1.0F). Not a beyond-default augment.
+            return;
+        }
+
+        String affixId = getAffixId(prevInst.affix());
         if (affixId.isEmpty()) return;
 
-        int newCount = getAugmentOverCount(stack, inst) + 1;
+        int newCount = getAugmentOverCount(stack, prevInst) + 1;
         String key = TAG_AUGMENT_PREFIX + affixId.replace(':', '_');
 
         CompoundTag afxData = stack.getOrCreateTagElement(AffixHelper.AFFIX_DATA);
