@@ -113,17 +113,6 @@ public abstract class ReforgingMenuMixin {
         for (int i = 0; i < 3; i++) {
             ItemStack output = this.choicesInv.getStackInSlot(i);
             if (!output.isEmpty()) {
-                int inputSockets = dev.shadowsoffire.apotheosis.adventure.socket.SocketHelper.getSockets(input);
-                int currentChoiceSockets = dev.shadowsoffire.apotheosis.adventure.socket.SocketHelper.getSockets(output);
-
-                // フェイルセーフ: 万が一倍増バグ(currentChoiceSockets >= 2 * inputSockets)が発生していた場合
-                // 純粋な足し算 (inputSockets + roll) に是正する
-                if (inputSockets > 0 && currentChoiceSockets >= 2 * inputSockets) {
-                    int roll = currentChoiceSockets - (2 * inputSockets);
-                    int targetSockets = inputSockets + Math.max(0, roll);
-                    dev.shadowsoffire.apotheosis.adventure.socket.SocketHelper.setSockets(output, targetSockets);
-                }
-
                 ExponentialCostHelper.recordReforgeSuccess(output, input, rarity);
                 this.choicesInv.setStackInSlot(i, output);
             }

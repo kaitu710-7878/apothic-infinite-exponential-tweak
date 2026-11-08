@@ -7,6 +7,11 @@
 <a name="english"></a>
 ## English
 
+### [1.2.4] - 2026-11-08
+#### Fixed
+- Fixed an issue where repeatedly reforging an item within the same high-socket tier (such as Esoteric, which rolls 5 sockets guaranteed) without switching tiers failed to increase sockets. Eliminated the miscalculated fail-safe clamp in reforging menus that erroneously flagged legitimate same-tier socket additions ($S_{\text{roll}} \ge S_{\text{input}}$) as duplication bugs.
+- Added pre-roll socket reset in `LootControllerMixin` (`@At("HEAD")`), ensuring that reforged item copies strictly start with 0 sockets before candidate generation, completely decoupling old sockets from candidate rolls.
+
 ### [1.2.3] - 2026-11-08
 #### Fixed
 - Fixed socket doubling multiplication bug (16 -> 32 -> 50) occurring in Esoteric and Ancient Reforging Tables by ensuring injection into obfuscated SRG method signatures (`m_6199_`) under `remap = false`.
@@ -148,6 +153,11 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.2.4] - 2026-11-08
+#### 修正
+- エソテリック等の高ソケット確定ティア（5ソケット）において、別ティアを挟まず同一ティアで連続再鍛造した際にソケットが増加しなかった不具合を修正。リフォージメニュー内の誤判定フェイルセーフが、正当な加算結果（$S_{\text{roll}} \ge S_{\text{input}}$）を掛け算倍増バグと誤認してロール増分を消去していた挙動を完全撤廃。
+- `LootControllerMixin` の先頭（HEAD）で再鍛造候補アイテムのソケット数を事前に 0 リセットする処理を追加。これによりソケットがロールされなかった場合でも旧ソケット数を引き継がず、純粋な足し算（$S_{\text{input}} + S_{\text{roll}}$）が全状況で成立。
 
 ### [1.2.3] - 2026-11-08
 #### 修正
