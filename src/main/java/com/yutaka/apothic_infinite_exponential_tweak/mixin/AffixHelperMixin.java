@@ -24,53 +24,71 @@ import java.util.Map;
 @Mixin(value = AffixHelper.class, remap = false)
 public abstract class AffixHelperMixin {
 
-    @Inject(method = "getAffixesImpl", at = @At("HEAD"), cancellable = true, remap = false)
-    private static void apoExp$getAffixesImpl(ItemStack stack, CallbackInfoReturnable<Map<DynamicHolder<? extends Affix>, AffixInstance>> cir) {
-        if (stack.isEmpty()) {
-            cir.setReturnValue(Collections.emptyMap());
-            return;
-        }
+    /**
+     * Cleanroom post-processor: Intercepts the return value of getAffixesImpl to restore
+     * per-affix original rarities and preserve tier compatibility without duplicating any base mod code.
+     */
+    @Inject(method = "getAffixesImpl", at = @At("RETURN"), cancellable = true, remap = false)
+    private static void apoExp$adjustAffixRarities(ItemStack stack, CallbackInfoReturnable<Map<DynamicHolder<? extends Affix>, AffixInstance>> cir) {
+        if (stack.isEmpty()) return;
 
         CompoundTag afxData = stack.getTagElement("affix_data");
-        if (afxData == null || !afxData.contains("affixes")) {
-            cir.setReturnValue(Collections.emptyMap());
-            return;
-        }
+        if (afxData == null || !afxData.contains("affix_rarities")) return;
 
-        CompoundTag affixes = afxData.getCompound("affixes");
-        DynamicHolder<LootRarity> globalRarity = AffixHelper.getRarity(afxData);
-        if (!globalRarity.isBound()) {
-            globalRarity = RarityRegistry.getMinRarity();
-        }
+        CompoundTag raritiesTag = afxData.getCompound("affix_rarities");
+        CompoundTag affixesTag = afxData.contains("affixes") ? afxData.getCompound("affixes") : null;
+        if (affixesTag == null) return;
 
-        CompoundTag raritiesTag = afxData.contains("affix_rarities") ? afxData.getCompound("affix_rarities") : null;
+        Map<DynamicHolder<? extends Affix>, AffixInstance> originalMap = cir.getReturnValue();
+        Map<DynamicHolder<? extends Affix>, AffixInstance> resultMap = new HashMap<>(originalMap);
         LootCategory cat = LootCategory.forItem(stack);
-        Map<DynamicHolder<? extends Affix>, AffixInstance> map = new HashMap<>();
+        boolean modified = false;
 
-        for (String key : affixes.getAllKeys()) {
-            try {
-                ResourceLocation affixId = new ResourceLocation(key);
-                DynamicHolder<Affix> affix = AffixRegistry.INSTANCE.holder(affixId);
-                if (!affix.isBound()) continue;
-
-                DynamicHolder<LootRarity> affixRarity = globalRarity;
-                if (raritiesTag != null && raritiesTag.contains(key)) {
-                    ResourceLocation rKey = new ResourceLocation(raritiesTag.getString(key));
-                    DynamicHolder<LootRarity> rHolder = RarityRegistry.INSTANCE.holder(rKey);
-                    if (rHolder != null && rHolder.isBound()) {
-                        affixRarity = rHolder;
+        // 1. Ensure existing instances in the map use their recorded affix rarity
+        for (Map.Entry<DynamicHolder<? extends Affix>, AffixInstance> entry : originalMap.entrySet()) {
+            DynamicHolder<? extends Affix> holder = entry.getKey();
+            AffixInstance inst = entry.getValue();
+            if (holder != null && holder.isBound() && inst != null) {
+                String affixIdStr = holder.getId().toString();
+                if (raritiesTag.contains(affixIdStr)) {
+                    try {
+                        ResourceLocation rKey = new ResourceLocation(raritiesTag.getString(affixIdStr));
+                        DynamicHolder<LootRarity> targetRarity = RarityRegistry.INSTANCE.holder(rKey);
+                        if (targetRarity != null && targetRarity.isBound() && !targetRarity.equals(inst.rarity())) {
+                            resultMap.put(holder, new AffixInstance(holder, stack, targetRarity, inst.level()));
+                            modified = true;
+                        }
+                    } catch (Throwable ignored) {
                     }
                 }
+            }
+        }
 
-                if (affix.get().canApplyTo(stack, cat, affixRarity.get())) {
-                    float lvl = affixes.getFloat(key);
-                    map.put(affix, new AffixInstance(affix, stack, affixRarity, lvl));
+        // 2. Recover any affixes that were dropped by vanilla getAffixesImpl due to global rarity change
+        for (String key : affixesTag.getAllKeys()) {
+            try {
+                ResourceLocation affixId = new ResourceLocation(key);
+                DynamicHolder<Affix> holder = AffixRegistry.INSTANCE.holder(affixId);
+                if (holder == null || !holder.isBound() || resultMap.containsKey(holder)) continue;
+
+                if (raritiesTag.contains(key)) {
+                    ResourceLocation rKey = new ResourceLocation(raritiesTag.getString(key));
+                    DynamicHolder<LootRarity> targetRarity = RarityRegistry.INSTANCE.holder(rKey);
+                    if (targetRarity != null && targetRarity.isBound()) {
+                        if (holder.get().canApplyTo(stack, cat, targetRarity.get())) {
+                            float lvl = affixesTag.getFloat(key);
+                            resultMap.put(holder, new AffixInstance(holder, stack, targetRarity, lvl));
+                            modified = true;
+                        }
+                    }
                 }
             } catch (Throwable ignored) {
             }
         }
 
-        cir.setReturnValue(Collections.unmodifiableMap(map));
+        if (modified) {
+            cir.setReturnValue(Collections.unmodifiableMap(resultMap));
+        }
     }
 
     @Inject(method = "setAffixes", at = @At("RETURN"), remap = false)

@@ -114,7 +114,14 @@ public abstract class EsotericReforgingMenuMixin {
         for (int i = 0; i < 3; i++) {
             ItemStack output = this.choicesInv.getStackInSlot(i);
             if (!output.isEmpty()) {
+                int inputSockets = dev.shadowsoffire.apotheosis.adventure.socket.SocketHelper.getSockets(input);
+                int currentChoiceSockets = dev.shadowsoffire.apotheosis.adventure.socket.SocketHelper.getSockets(output);
+                int rollSockets = Math.max(0, currentChoiceSockets - inputSockets);
+                int correctSockets = Math.max(inputSockets, rollSockets);
+                dev.shadowsoffire.apotheosis.adventure.socket.SocketHelper.setSockets(output, correctSockets);
+
                 ExponentialCostHelper.recordReforgeSuccess(output, input, rarity);
+                this.choicesInv.setStackInSlot(i, output);
             }
         }
     }

@@ -7,6 +7,12 @@
 <a name="english"></a>
 ## English
 
+### [1.2.1] - 2026-11-08
+#### Fixed
+- Fixed exponential socket multiplication caused by Apothic-Infinite adding input and choice sockets on every slot update. Socket counts are now strictly corrected to `Math.max(inputSockets, rollSockets)`, completely stopping socket ballooning.
+- Overhauled affix merging to allow same-tier duplicate rolls to enhance affix levels, while strictly isolating cross-tier duplicate additions to prevent stat explosion (such as reach 9 -> 23).
+- Eliminated all base mod source code duplication in `AffixHelperMixin` to strictly respect Apotheosis's All Rights Reserved (ARR) license, rewriting it as a 100% cleanroom return-value post-processor.
+
 ### [1.2.0] - 2026-11-08
 #### Added
 - Added per-affix rarity persistence (`affix_rarities` tag), ensuring affixes from different tiers (including Apotheotic Additions tiers: Esoteric, Heirloom, Artifact, etc.) retain their original tier calculation tables and do not vanish when reforged into other tiers.
@@ -129,6 +135,12 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.2.1] - 2026-11-08
+#### 修正
+- Apothic-Infinite がスロット更新ごとに `inputSockets + choiceSockets` を無差別に足し算していたことによるジェムスロット（ソケット）の指数関数的増殖不具合を根本修正。ソケット数を `Math.max(inputSockets, rollSockets)` に是正し、スロット肥大化を完全撤廃。
+- アフィックスマージロジックを刷新し、同一 tier 内での正当な重複強化（同じ Attribute の再抽選によるレベル合算）を許容しつつ、異なる tier 間での無差別合算による数値跳ね上がり（9 $\to$ 23 等）を防止。
+- Apotheosis 本体の著作権（All Rights Reserved）を厳格に遵守するため、`AffixHelperMixin` 内にあったベースMODのコード複製を完全撤廃し、戻り値インターセプトによる 100% クリーンルーム実装へ刷新。
 
 ### [1.2.0] - 2026-11-08
 #### 追加・新機能

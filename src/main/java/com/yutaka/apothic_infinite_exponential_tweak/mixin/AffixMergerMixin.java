@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Pseudo
 @Mixin(targets = "com.maxwell.apothic_infnite.adventure.util.AffixMerger", remap = false)
@@ -49,17 +50,28 @@ public abstract class AffixMergerMixin {
                 if (holder != null && holder.isBound()) {
                     merged.compute((DynamicHolder<? extends Affix>) holder, (h, oldInst) -> {
                         if (oldInst == null) {
+                            // 新規強化枠: アイテムに無かった新しいアフィックスを追加
                             return newInst;
                         }
 
                         Affix affix = h.get();
-                        // 耐久力免除 (DurableAffix) および 特定属性ダメージ軽減 (DamageReductionAffix) は統合する
+                        // 耐久力免除および特定属性ダメージ軽減は常に統合（合算）
                         if (affix instanceof DurableAffix || affix instanceof DamageReductionAffix) {
                             return new AffixInstance(h, output, newInst.rarity(), oldInst.level() + newInst.level());
                         }
 
-                        // それ以外（AttributeAffix, PotionAffix等）は既存バフが勝手に伸びないように旧インスタンスを維持する
-                        return oldInst;
+                        // レアリティが同一かどうかの判定
+                        boolean sameTier = oldInst.rarity() != null && newInst.rarity() != null
+                                && Objects.equals(oldInst.rarity().getId(), newInst.rarity().getId());
+
+                        if (sameTier) {
+                            // 同じ tier の場合は重複強化（合算）を適用
+                            return new AffixInstance(h, output, newInst.rarity(), oldInst.level() + newInst.level());
+                        } else {
+                            // 異なる tier のアフィックスによる重複強化の異常跳ね上がりを防止:
+                            // 異なる tier の場合は加算せず、既存インスタンス（旧レアリティ・旧レベル）を維持
+                            return oldInst;
+                        }
                     });
                 }
             });
