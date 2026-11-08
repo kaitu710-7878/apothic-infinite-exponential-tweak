@@ -7,6 +7,15 @@
 <a name="english"></a>
 ## English
 
+### [1.2.3] - 2026-11-08
+#### Fixed
+- Fixed socket doubling multiplication bug (16 -> 32 -> 50) occurring in Esoteric and Ancient Reforging Tables by ensuring injection into obfuscated SRG method signatures (`m_6199_`) under `remap = false`.
+- Introduced `LootControllerMixin` with a clean `@Redirect` on `SocketHelper.getSockets(stack)` during active reforges (`isReforgingActive()`), preventing Apotheosis's `createLootItem` from overriding freshly rolled socket counts ($S_{\text{roll}}$) with existing input socket counts via `Math.max(socketsRolled, inputSockets)`. As a result, Apothic-Infinite's socket accumulation evaluates strictly to a mathematically pure addition ($S_{\text{input}} + S_{\text{roll}}$) across all table types.
+- Added fail-safe clamp in all reforging menus to guarantee sockets never multiply under any edge-case conditions.
+#### Refactored
+- Overhauled package namespace from account-based identifier to neutral `dev.tweak.apothic_infinite_exponential_tweak` in strict compliance with project guidelines.
+- Verified 100% clean UTF-8 (without BOM) across all codebase files.
+
 ### [1.2.2] - 2026-11-08
 #### Fixed
 - Fixed socket doubling multiplication bug (16 -> 32 -> 50) where Apothic-Infinite added input sockets to choice sockets that already inherited input sockets from Apotheosis's `input.copy()`. Corrected to true addition ($S_{\text{input}} + S_{\text{roll}}$), ensuring sockets increment steadily by roll amount rather than doubling.
@@ -139,6 +148,15 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.2.3] - 2026-11-08
+#### 修正
+- エソテリックおよびエンシェントリフォージテーブルにおいて、難読化環境下でメソッドシグネチャ（`m_6199_`）へのインジェクションがスキップされ、ソケット倍増（16 $\to$ 32 $\to$ 50）が再発していた不具合を修正。
+- 再鍛造生成中に `SocketHelper.getSockets(stack)` をインターセプトする `LootControllerMixin` を導入。Apotheosis が `Math.max(socketsRolled, inputSockets)` で今回ロールされた純粋なソケット数（$S_{\text{roll}}$）を元アイテムのソケット数で上書き・消失させていた挙動を解消。これにより、Apothic-Infinite のスロット加算が全テーブル（通常、Ancient、Esoteric）で完全に「純粋な足し算」（$S_{\text{input}} + S_{\text{roll}}$）として機能するよう抜本的修正。
+- 全リフォージメニューにフェイルセーフガードを追加し、予期せぬ状況下でもソケットが倍増（掛け算）しない安全機構を配備。
+#### リファクタリング
+- ガイドライン（パッケージ名にアカウント名等の使用禁止）を厳格に遵守するため、パッケージ構成を中立的な `dev.tweak.apothic_infinite_exponential_tweak` へ全面刷新。
+- 全ソースコードおよびリソースの UTF-8（BOMなし）整合性を検証・徹底。
 
 ### [1.2.2] - 2026-11-08
 #### 修正
