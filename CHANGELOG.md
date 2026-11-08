@@ -7,6 +7,17 @@
 <a name="english"></a>
 ## English
 
+### [1.2.0] - 2026-11-08
+#### Added
+- Added per-affix rarity persistence (`affix_rarities` tag), ensuring affixes from different tiers (including Apotheotic Additions tiers: Esoteric, Heirloom, Artifact, etc.) retain their original tier calculation tables and do not vanish when reforged into other tiers.
+- Added multi-reforge affix merging control for repeated reforges of the same tier: newly rolled affixes generate new tooltip entries, while existing Attribute and Potion affixes maintain their level without unintended inflation.
+- Added selective merging: only durability exemption (`DurableAffix`) and armor-specific damage reduction (`DamageReductionAffix`) are merged and summed upon duplicate roll.
+- Added a 99% (0.99F) cap to damage reduction from `DamageReductionAffix` across gameplay damage calculation, tooltip descriptions, and augmenting text.
+#### Fixed
+- Fixed an issue where reforging an item with an Esoteric affix (such as reach) to Mythic caused reach to scale abnormally high (e.g. 9 -> 23) due to evaluation in Mythic's step functions and unbounded level addition.
+- Fixed an issue where repeated reforges caused existing Attribute buff values to unexpectedly increase even when a new Attribute buff was generated.
+- Fixed `AttributeAffix` modifier UUID generation to be deterministic and affix-unique, preventing UUID collisions and allowing distinct affixes with the same attribute to apply simultaneously.
+
 ### [1.1.1] - 2026-10-31
 #### Fixed
 - Fixed an issue where items reforged/merged via Apothic-Infinite (having affix levels >= 1.0F from reforges) were falsely penalized with exorbitant augment costs upon first entering the Augmenting Table.
@@ -118,6 +129,17 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.2.0] - 2026-11-08
+#### 追加・新機能
+- アフィックスごとのレアリティ保持タグ（`affix_rarities`）の導入により、異なる tier（Apotheotic Additions の Esoteric、Heirloom、Artifact 等を含む）のアフィックスを施しても効果が消滅せず、付与時の計算テーブルを維持して正常に適用されるよう対応。
+- 同一 tier における2回目以降の再鍛造時、新規抽選されたアフィックスがツールチップ上部に新規項目として追加され、既存の Attribute / ポーション等のバフ数値は勝手に加算・肥大化しないよう制御。
+- 耐久力免除（`DurableAffix`）および防具の特定属性ダメージ軽減（`DamageReductionAffix`）のみを統合（マージ・加算）対象として限定。
+- 特定属性ダメージ軽減（`DamageReductionAffix`）の最大割合を 99% (0.99F) に規定（被ダメージ計算、ツールチップ説明、補強画面テキストすべてで上限キャップを適用）。
+#### 修正
+- エソテリックアフィックス付与後にミシックを付与した際、エソテリックのリーチがミシックの計算テーブルや無差別加算で異常に強化される（例: 9 $\to$ 23）不具合を修正。
+- アフィックス2回目で新しい Attribute バフが発生しているにもかかわらず既存バフの項目まで伸びてしまう不具合を修正。
+- `AttributeAffix` のモディファイア UUID をアフィックスID固有の決定論的 UUID とすることで、同じ属性を持つ異なるアフィックス同士が競合・上書きされずに両方適用されるよう修正。
 
 ### [1.1.1] - 2026-10-31
 #### 修正
