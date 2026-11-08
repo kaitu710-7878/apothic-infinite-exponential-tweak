@@ -22,9 +22,10 @@ An addon for **Apotheosis** and **Apothic Infinite** (Minecraft 1.20.1 Forge) th
    - **Selective Integration:** Durability exemption (`DurableAffix`) and armor damage reductions (`DamageReductionAffix`) are automatically unified upon duplicate rolls.
    - **99% Damage Reduction Hard Cap:** Specific damage reduction affixes are strictly capped at 99% (0.99F) across incoming damage calculation, item tooltips, and augmenting screens, preserving game balance.
 
-3. **True Additive Socket Scaling (Eliminating the Doubling Bug)**
+3. **True Additive Socket Scaling (Eliminating Doubling & Freezing Bugs)**
    - **Root-Cause Fix:** Fixes the severe bug where reforging an item with existing sockets (e.g., 16 sockets) caused Apothic-Infinite to double the socket count on each reforge (16 -> 32 -> 50 / cap) due to Apotheosis preserving input sockets inside `input.copy()`.
-   - **Pure Addition ($S_{\text{input}} + S_{\text{roll}}$):** By cleanly redirecting socket resolution during reforge candidate creation, newly rolled sockets (0 to 4 depending on rarity rules) are added purely on top of existing sockets (e.g. $16 + 2 = 18$). Compatible across standard, Ancient, and Esoteric Reforging Tables.
+   - **Same-Tier & Cross-Tier Pure Addition ($S_{\text{input}} + S_{\text{roll}}$):** Whether repeatedly reforging within the exact same tier (such as Esoteric, which guarantees 5 sockets per roll, advancing $5 \to 10 \to 15 \to 20 \dots$) or cross-reforging between different tiers (Common through Mythic and addon tiers), socket counts strictly scale additively.
+   - **Pre-Roll Socket Decoupling:** Newly rolled sockets are dynamically decoupled during candidate creation, ensuring that rolled sockets are purely added on top of existing sockets across standard, Ancient, and Esoteric Reforging Tables.
 
 4. **Default Maximum Duplicate Reforge Limit Bypass**
    - Automatically unlocks Apothic-Infinite's default limit on duplicate reforges (`max_affix_level`), setting it to the maximum allowable value (`1.0E300` / practically infinite).
@@ -95,9 +96,10 @@ Minecraft 1.20.1 Forge環境向け、**Apotheosis** および **Apothic Infinite
    - **特定項目の自動統合:** 耐久力免除（`DurableAffix`）および防具の特定属性ダメージ軽減（`DamageReductionAffix`）は重複時に自動的に統合されます。
    - **ダメージ軽減 99% 上限キャップ:** 特定属性ダメージ軽減は、重複強化を重ねても最大 99% (0.99F) にクランプされ、完全無敵化を防ぎつつ実質的な最大耐性を確保します（ダメージ計算、ツールチップ、補強画面すべてに反映）。
 
-3. **ジェムスロット（ソケット）の純粋加算化（倍増バグの完全解消）**
-   - **バグの根本原因解消:** Apotheosis がスロット0の `input.copy()`（既存ソケット数を保持した状態）をベースに再鍛造候補をロールするため、既存ソケットがあるアイテムを再鍛造すると Apothic-Infinite の加算処理によってソケット数が 16 $\to$ 32 $\to$ 50 と倍増（掛け算）してしまう致命的な不具合を解消しました。
-   - **完全な純粋加算 ($S_{\text{input}} + S_{\text{roll}}$):** 再鍛造候補の生成時に今回ロールされたソケット数（レアリティルールに応じた 0〜4 個）のみを抽出し、既存のソケット数にそのまま足し算（例: 16個のアイテムなら $+2$ ロールで 18個）されるよう是正しました。通常、Ancient、Esoteric のすべての再鍛造台に対応しています。
+3. **ジェムスロット（ソケット）の純粋加算化（倍増・停止バグの完全解消）**
+   - **倍増バグの根絶:** Apotheosis がスロット0の `input.copy()`（既存ソケット数を保持した状態）をベースに再鍛造候補をロールするため、既存ソケットがあるアイテムを再鍛造すると Apothic-Infinite の加算処理によってソケット数が 16 $\to$ 32 $\to$ 50 と倍増（掛け算）してしまう致命的な不具合を解消しました。
+   - **同一ティア連続・異種ティア間の完全純粋加算 ($S_{\text{input}} + S_{\text{roll}}$):** エソテリック等の高ソケット確定ティア（1回あたり5ソケット確定ロール）で別ティアを挟まず同一ティアだけで連続再鍛造した場合（$5 \to 10 \to 15 \to 20 \dots$）でも、ミシック等の確率ロールティア（$+0 \sim 4$個）や他ティアを跨いだ再鍛造でも、常にロール結果が既存ソケット数に着実に純粋加算されます。
+   - **事前ソケット分離機構:** 候補アイテム生成時に事前のソケット数分離を行うことで、倍増（掛け算）バグを根絶するとともに、ロール増分が消去される誤判定トラブルを完全解消。通常、Ancient、Esoteric の全再鍛造台に対応しています。
 
 4. **重複鍛造回数のデフォルト最大値化 (上限完全開放)**
    - Apothic-Infiniteの重複鍛造上限（`max_affix_level`、デフォルト10.0）を自動的に最大値（実質無限大）へバイパスします。
