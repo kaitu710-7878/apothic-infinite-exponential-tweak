@@ -111,11 +111,12 @@ public abstract class AncientReforgingMenuMixin {
         for (int i = 0; i < 3; i++) {
             ItemStack output = this.choicesInv.getStackInSlot(i);
             if (!output.isEmpty()) {
+                // apoinf が inputSockets + choiceSockets (choiceSockets = inputSockets + rollSockets)
+                // として2倍（掛け算）に増やしてしまうのを是正し、純粋な足し算 (inputSockets + rollSockets) に補正
                 int inputSockets = dev.shadowsoffire.apotheosis.adventure.socket.SocketHelper.getSockets(input);
                 int currentChoiceSockets = dev.shadowsoffire.apotheosis.adventure.socket.SocketHelper.getSockets(output);
-                int rollSockets = Math.max(0, currentChoiceSockets - inputSockets);
-                int correctSockets = Math.max(inputSockets, rollSockets);
-                dev.shadowsoffire.apotheosis.adventure.socket.SocketHelper.setSockets(output, correctSockets);
+                int targetSockets = Math.max(inputSockets, currentChoiceSockets - inputSockets);
+                dev.shadowsoffire.apotheosis.adventure.socket.SocketHelper.setSockets(output, targetSockets);
 
                 ExponentialCostHelper.recordReforgeSuccess(output, input, rarity);
                 this.choicesInv.setStackInSlot(i, output);

@@ -7,6 +7,10 @@
 <a name="english"></a>
 ## English
 
+### [1.2.2] - 2026-11-08
+#### Fixed
+- Fixed socket doubling multiplication bug (16 -> 32 -> 50) where Apothic-Infinite added input sockets to choice sockets that already inherited input sockets from Apotheosis's `input.copy()`. Corrected to true addition ($S_{\text{input}} + S_{\text{roll}}$), ensuring sockets increment steadily by roll amount rather than doubling.
+
 ### [1.2.1] - 2026-11-08
 #### Fixed
 - Fixed exponential socket multiplication caused by Apothic-Infinite adding input and choice sockets on every slot update. Socket counts are now strictly corrected to `Math.max(inputSockets, rollSockets)`, completely stopping socket ballooning.
@@ -135,6 +139,10 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.2.2] - 2026-11-08
+#### 修正
+- Apotheosis がスロット0の `input.copy()`（既存ソケット数を保持した状態）をベースに再鍛造候補をロールするため、Apothic-Infinite の素朴な加算によって $2 \times S_{\text{input}} + S_{\text{roll}}$ と2倍（掛け算、16 $\to$ 32 $\to$ 50）に跳ね上がっていた不具合を修正。純粋な足し算（$S_{\text{input}} + S_{\text{roll}}$）へ是正し、再鍛造でロールされた分だけ着実に増えるよう改善。
 
 ### [1.2.1] - 2026-11-08
 #### 修正
