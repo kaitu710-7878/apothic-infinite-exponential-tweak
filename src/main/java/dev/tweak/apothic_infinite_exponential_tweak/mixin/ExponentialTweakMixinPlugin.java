@@ -50,6 +50,12 @@ public class ExponentialTweakMixinPlugin implements IMixinConfigPlugin {
             return isModLoaded("apothic_infnite")
                     || isResourceAvailable("com/maxwell/apothic_infnite/adventure/util/AffixMerger.class");
         }
+        if (mixinClassName.endsWith("FriendlyByteBufMixin")) {
+            // BiggerStacks handles packet serialization for larger item counts with writeInt/readInt.
+            // Applying our FriendlyByteBufMixin alongside BiggerStacks causes a @Redirect conflict and protocol mismatch.
+            return !isModLoaded("biggerstacks")
+                    && !isResourceAvailable("portb/biggerstacks/mixin/vanilla/FriendlyByteBufMixin.class");
+        }
         return true;
     }
 

@@ -7,6 +7,10 @@
 <a name="english"></a>
 ## English
 
+### [1.2.5] - 2026-11-09
+#### Fixed
+- Fixed critical crash (`InjectionError` in `biggerstacks.mixins.json:vanilla.FriendlyByteBufMixin`) when running alongside Bigger Stacks. Dynamically skips `FriendlyByteBufMixin` when Bigger Stacks is present, avoiding `@Redirect` conflict on `FriendlyByteBuf#writeItemStack` and preventing network packet serialization desync since Bigger Stacks natively manages 32-bit integer stack sizes across network buffers.
+
 ### [1.2.4] - 2026-11-08
 #### Fixed
 - Fixed an issue where repeatedly reforging an item within the same high-socket tier (such as Esoteric, which rolls 5 sockets guaranteed) without switching tiers failed to increase sockets. Eliminated the miscalculated fail-safe clamp in reforging menus that erroneously flagged legitimate same-tier socket additions ($S_{\text{roll}} \ge S_{\text{input}}$) as duplication bugs.
@@ -153,6 +157,10 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.2.5] - 2026-11-09
+#### 修正
+- Bigger Stacks 導入環境で起動時にゲームがクラッシュする不具合（`biggerstacks.mixins.json:vanilla.FriendlyByteBufMixin` における `InjectionError`）を修正。Bigger Stacks がロードされている場合は、本MOD側の `FriendlyByteBufMixin` を自動的にスキップすることで、`FriendlyByteBuf#writeItemStack` に対する `@Redirect` の競合を回避。Bigger Stacks 自身の32bit整数ネットワークシリアライズに委ねることでパケット不整合も完全に防止。
 
 ### [1.2.4] - 2026-11-08
 #### 修正
