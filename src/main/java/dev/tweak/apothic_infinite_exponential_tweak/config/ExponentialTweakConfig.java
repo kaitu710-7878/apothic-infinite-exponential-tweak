@@ -9,6 +9,8 @@ public class ExponentialTweakConfig {
     public static final ForgeConfigSpec.BooleanValue OVERRIDE_MAX_AFFIX_LEVEL_TO_MAX;
     public static final ForgeConfigSpec.DoubleValue CUSTOM_MAX_AFFIX_LEVEL;
 
+    public static final ForgeConfigSpec.BooleanValue LIMIT_ENCHANTMENT_LEVEL_TO_APOTHEOSIS_PLUS_TWO;
+
     public static final ForgeConfigSpec.DoubleValue BASE_EXPONENT;
     public static final ForgeConfigSpec.BooleanValue SCALE_SIGIL_COST;
     public static final ForgeConfigSpec.BooleanValue SCALE_MATERIAL_COST;
@@ -35,6 +37,14 @@ public class ExponentialTweakConfig {
                         "The maximum affix level multiplier to use if override_max_affix_level_to_max is true.",
                         "Default is 1.0E300 (practically infinite).")
                 .defineInRange("custom_max_affix_level", 1.0E300, 1.0, Double.MAX_VALUE);
+        BUILDER.pop();
+
+        BUILDER.push("Enchantment Level Limit");
+        LIMIT_ENCHANTMENT_LEVEL_TO_APOTHEOSIS_PLUS_TWO = BUILDER.comment(
+                        "If true, overrides Apothic-Infinite's global enchantment level cap (default 100)",
+                        "and limits each enchantment to its Apotheosis default maximum level + 2.",
+                        "If false (default), Apothic-Infinite's standard enchantment level limit behavior is preserved.")
+                .define("limit_enchantment_level_to_apotheosis_plus_two", false);
         BUILDER.pop();
 
         BUILDER.push("Exponential Cost Scaling");

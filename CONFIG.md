@@ -13,6 +13,7 @@ The server configuration file is saved at `config/apothic_infinite_exponential_t
 | :--- | :--- | :--- | :--- |
 | `override_max_affix_level_to_max` | `Boolean` | `true` | If true, overrides Apothic-Infinite's duplicate reforge limit (`max_affix_level`) to the maximum possible value, enabling unlimited affix stacking by default. |
 | `custom_max_affix_level` | `Double` | `1.0E300` | The custom maximum affix level multiplier to use if `override_max_affix_level_to_max` is true. |
+| `limit_enchantment_level_to_apotheosis_plus_two` | `Boolean` | `false` | If true, overrides Apothic-Infinite's global enchantment level cap (default 100) and limits each enchantment to its Apotheosis default maximum level + 2. |
 | `base_exponent` | `Double` | `2.0` | The base of the exponential cost calculation ($M = \text{base}^{\text{count}-1}$). Default is 2.0 (1x, 2x, 4x, 8x...). |
 | `scale_sigil_cost` | `Boolean` | `true` | Whether the Sigils of Reforging (Sigil of Rebirth) cost scales exponentially on repeated reforges. |
 | `scale_material_cost` | `Boolean` | `true` | Whether the rarity materials cost scales exponentially on repeated reforges. |
@@ -34,6 +35,7 @@ The server configuration file is saved at `config/apothic_infinite_exponential_t
 | :--- | :--- | :--- | :--- |
 | `override_max_affix_level_to_max` | `Boolean` | `true` | trueの場合、Apothic-Infiniteの重複鍛造回数上限（`max_affix_level`）をデフォルトで最大値に開放し、無限の重複強化を可能にします。 |
 | `custom_max_affix_level` | `Double` | `1.0E300` | 上記がtrueの場合に適用されるアフィックスレベルの最大倍率（実質無制限）。 |
+| `limit_enchantment_level_to_apotheosis_plus_two` | `Boolean` | `false` | trueの場合、Apothic-Infiniteの一律エンチャント上限（デフォルト100）を上書きし、各エンチャントの上限をApotheosisデフォルト上限+2に制限します。 |
 | `base_exponent` | `Double` | `2.0` | 指数コスト計算の底（基数）。計算式: $2^{(\text{回数}-1)}$。デフォルト2.0（1倍、2倍、4倍、8倍…）。 |
 | `scale_sigil_cost` | `Boolean` | `true` | trueの場合、再鍛造の紋章（Sigil of Rebirth）の必要数を指数関数的に増加させます。 |
 | `scale_material_cost` | `Boolean` | `true` | trueの場合、レアリティマテリアルの必要数を指数関数的に増加させます。 |

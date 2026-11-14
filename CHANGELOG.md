@@ -7,6 +7,15 @@
 <a name="english"></a>
 ## English
 
+### [1.3.1] - 2026-11-14
+#### Fixed
+- Fixed an issue where Apotheosis enchantments could resolve to corrupted maximum levels (e.g. `106` / `CVI`) when `EnchModule` initialized before server config loading, and added recovery fallback in `EnchantmentCapHelper` when `enchantments.cfg` contains polluted values (`>= 100`).
+- Fixed an issue where Apothic-Infinite's additive re-enchanting (`RealEnchantmentHelper#selectEnchantment`) and `EnchantmentHelper` level capping bypassed the Apotheosis + 2 limit due to early return cancellation in Apothic-Infinite's `@Inject(at = @At("RETURN"), cancellable = true)` mixins. Replaced with `@At("HEAD")` wrapper mixins so all post-addition levels are strictly capped.
+
+### [1.3.0] - 2026-11-14
+#### Added
+- Added optional configuration `limit_enchantment_level_to_apotheosis_plus_two` (disabled `false` by default). When enabled, overrides Apothic-Infinite's uniform enchantment level cap (default 100) via cleanroom Mixins on `EnchHooks`, `Enchantment`, `EnchantmentHelper`, `RealEnchantmentHelper`, and `EnchModule`, limiting each enchantment to its Apotheosis default maximum level + 2 (respecting `allow_high_level_curses` for curses).
+
 ### [1.2.5] - 2026-11-09
 #### Fixed
 - Fixed critical crash (`InjectionError` in `biggerstacks.mixins.json:vanilla.FriendlyByteBufMixin`) when running alongside Bigger Stacks. Dynamically skips `FriendlyByteBufMixin` when Bigger Stacks is present, avoiding `@Redirect` conflict on `FriendlyByteBuf#writeItemStack` and preventing network packet serialization desync since Bigger Stacks natively manages 32-bit integer stack sizes across network buffers.
@@ -157,6 +166,15 @@
 
 <a name="japanese"></a>
 ## 日本語
+
+### [1.3.1] - 2026-11-14
+#### 修正
+- サーバーコンフィグ読み込み前に `EnchModule` が初期化される際、Apothic-Infinite の `EnchantmentMixin` によって一部エンチャントの最大レベルが `106`（CVI）等へ異常に膨れ上がる問題を修正（`EnchModule` 解決時は常に元の値を通すようにし、すでに `enchantments.cfg` が `100` 以上で汚染されている場合も `EnchantmentCapHelper` で正常値を再算出して救済）。
+- Apothic-Infinite による 2 回目以降のエンチャント加算（`RealEnchantmentHelper#selectEnchantment`）および `EnchantmentHelper` の上限キャップが、ApoInf 側の `@Inject(at = @At("RETURN"), cancellable = true)` の早期リターンにより本MODの上限処理をすり抜けていた問題を修正。`@At("HEAD")` ラッパー方式へ変更し、加算後のレベルも確実に Apotheosis デフォルト + 2 に制限されるようにしました。
+
+### [1.3.0] - 2026-11-14
+#### 追加
+- コンフィグ項目 `limit_enchantment_level_to_apotheosis_plus_two`（デフォルト `false`）を追加。有効にすると、`EnchHooks`、`Enchantment`、`EnchantmentHelper`、`RealEnchantmentHelper`、`EnchModule` に対するクリーンルーム Mixin により、Apothic-Infinite のエンチャント上限一律100拡張を上書きし、各エンチャントの上限をそれぞれの Apotheosis デフォルト上限 + 2 に変更します（呪いエンチャントは Apothic-Infinite の `allow_high_level_curses` 設定を尊重します）。
 
 ### [1.2.5] - 2026-11-09
 #### 修正

@@ -69,6 +69,10 @@ An addon for **Apotheosis** and **Apothic Infinite** (Minecraft 1.20.1 Forge) th
    - Full soft compatibility with addon tables such as *Ancient Reforging*, *Esoteric Reforging*, and *Apotheotic Additions*.
    - Strictly respects Apotheosis's All Rights Reserved (ARR) license through 100% cleanroom Mixin interception, containing zero copied base code.
 
+10. **Optional Apotheosis Default + 2 Enchantment Level Cap**
+    - Includes an optional configuration (`limit_enchantment_level_to_apotheosis_plus_two`, disabled `false` by default) to replace Apothic-Infinite's uniform enchantment level cap (default 100) with each enchantment's Apotheosis default maximum level + 2.
+    - Consistently enforces this per-enchantment cap across enchanting tables (including Apothic-Infinite's additive re-enchanting), anvils, loot generation, and item enchantment reading, while respecting Apothic-Infinite's `allow_high_level_curses` setting for curses.
+
 ### Requirements
 - Minecraft 1.20.1
 - Minecraft Forge (47.1.0 or higher recommended)
@@ -141,6 +145,10 @@ Minecraft 1.20.1 Forge環境向け、**Apotheosis** および **Apothic Infinite
 9. **高いアドオン親和性＆クリーンルーム著作権遵守**
    - *Ancient Reforging*、*Esoteric Reforging*、*Apotheotic Additions* などの主要アドオンと高水準で連動。
    - Apotheosis 本体の著作権（All Rights Reserved）を厳格に遵守し、ベースMODのコードコピーを一切含まない 100% クリーンルーム実装を確立しています。
+
+10. **エンチャント上限の Apotheosis デフォルト + 2 制限オプション**
+    - Apothic-Infinite の一律エンチャントレベル上限（デフォルト 100）を、各エンチャントの Apotheosis デフォルト上限 + 2 に変更するオプション設定（`limit_enchantment_level_to_apotheosis_plus_two`、デフォルト `false`）を搭載しています。
+    - エンチャントテーブル（Apothic-Infinite の重ねがけ加算を含む）、金床、ルート生成、およびアイテムのエンチャント取得処理のすべてで各エンチャント上限 + 2 を一貫して適用し、呪いエンチャントについては Apothic-Infinite の `allow_high_level_curses` 設定を尊重します。
 
 ### 導入要件
 - Minecraft 1.20.1

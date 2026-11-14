@@ -22,7 +22,12 @@
     "FriendlyByteBufMixin",
     "ItemStackHandlerMixin",
     "AbstractContainerMenuMixin",
-    "AugmentingMenuMixin"
+    "AugmentingMenuMixin",
+    "EnchModuleMixin",
+    "EnchHooksMixin",
+    "EnchantmentMixin",
+    "EnchantmentHelperMixin",
+    "RealEnchantmentHelperMixin"
   ],
   "client": [
     "AugmentingScreenMixin",
